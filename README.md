@@ -6,8 +6,8 @@ App Android nativa en Kotlin (sin librerias externas, sin anuncios). Rutina diar
 1. Descomprime este zip ENCIMA de tu carpeta local, reemplazando todo.
 2. Sube los cambios con Git (`git add .`, `git commit`, `git push`).
 3. GitHub Actions compila la APK. Para sacar una version descargable en el celular:
-   `git tag v1.1` y luego `git push origin v1.1`.
-4. En el celular: GitHub, repositorio, Releases, version v1.1, Assets, descarga `GROW-v1.1.apk` e instala.
+   `git tag v1.2` y luego `git push origin v1.2`.
+4. En el celular: GitHub, repositorio, Releases, version v1.2, Assets, descarga `GROW-v1.2.apk` e instala.
    (Tambien queda como artefacto en Actions en cada push a main.)
 
 La firma esta en `app/grow.jks`: no la cambies, asi cada APK se instala encima de la anterior sin perder datos.

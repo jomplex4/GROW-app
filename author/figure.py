@@ -11,7 +11,7 @@ def up(a):
     r = math.radians(a); return (math.sin(r), -math.cos(r))
 def add(p, v, k=1.0): return (p[0]+v[0]*k, p[1]+v[1]*k)
 
-KEYS = ["t","h","hf","un","fn","uf","ff","tn","sn","tf","sf","jaw","fo","fof"]
+KEYS = ["t","h","hf","un","fn","uf","ff","tn","sn","tf","sf","jaw","fo","fof","kn","kf","cn","cf"]
 
 def fk(P, hip=(0.0,0.0)):
     """P: dict of angles. returns dict of joint points"""
@@ -25,7 +25,8 @@ def fk(P, hip=(0.0,0.0)):
         So = add(S, (sg*0.07,0)) if fr else S
         Ho = add(H, (sg*0.04,0)) if fr else H
         E = add(So, dn(u), L["ua"]); Wr = add(E, dn(f), L["fa"]); Hd = add(Wr, dn(f), L["hand"])
-        K = add(Ho, dn(t), L["th"]); A = add(K, dn(s), L["sh"])
+        kk = P.get("kn",1) if side=="n" else P.get("kf",1); cc = P.get("cn",1) if side=="n" else P.get("cf",1)
+        K = add(Ho, dn(t), L["th"]*kk); A = add(K, dn(s), L["sh"]*cc)
         fo = P.get("fo",90) if side=="n" else P.get("fof",P.get("fo",90)); fd = dn(s + (fo if (side=="n" or not P.get("front")) else -fo))
         T = add(A, fd, L["ft"]); Hl = add(A, fd, -0.02)
         pts.update({"So"+side:So,"Ho"+side:Ho,"E"+side:E, "W"+side:Wr, "Hd"+side:Hd, "K"+side:K, "A"+side:A, "T"+side:T, "Hl"+side:Hl})
@@ -40,7 +41,7 @@ def extent(P, pts):
     return out
 
 def default(P):
-    Q = dict(t=0,h=None,hf=0,un=0,fn=None,uf=None,ff=None,tn=0,sn=None,tf=None,sf=None,jaw=0,fo=90,fof=None,rope=None,lift=0,grab=None,front=False,ra=None,la=None,rl=None,ll=None)
+    Q = dict(t=0,h=None,hf=0,un=0,fn=None,uf=None,ff=None,tn=0,sn=None,tf=None,sf=None,jaw=0,fo=90,fof=None,kn=1,kf=1,cn=1,cf=1,rope=None,lift=0,grab=None,front=False,ra=None,la=None,rl=None,ll=None)
     Q.update(P)
     if Q["h"] is None: Q["h"]=Q["t"]
     if Q["fof"] is None: Q["fof"]=Q["fo"]

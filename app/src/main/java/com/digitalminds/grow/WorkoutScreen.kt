@@ -31,6 +31,31 @@ class BarView(ctx: Context, val trackColor: Int, val fillColor: Int) : View(ctx)
     }
 }
 
+/** Capsule button whose fill is the exercise progress; shows PAUSE / RESUME. */
+class PillButton(ctx: Context) : View(ctx) {
+    var label = "PAUSE"
+        set(v) { field = v; invalidate() }
+    var fraction = 0f
+        set(v) { field = v.coerceIn(0f, 1f); invalidate() }
+    private val p = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val clip = android.graphics.Path()
+    init { isClickable = true; p.typeface = HEAD; p.textAlign = Paint.Align.CENTER; p.letterSpacing = 0.12f }
+    override fun onDraw(c: Canvas) {
+        val w = width.toFloat(); val h = height.toFloat()
+        p.style = Paint.Style.FILL; p.color = C.CARD2
+        c.drawRoundRect(RectF(0f, 0f, w, h), h / 2, h / 2, p)
+        if (fraction > 0f) {
+            clip.rewind(); clip.addRoundRect(RectF(0f, 0f, w, h), h / 2, h / 2, android.graphics.Path.Direction.CW)
+            c.save(); c.clipPath(clip)
+            p.color = C.RED
+            c.drawRect(0f, 0f, maxOf(h * 0.9f, w * fraction), h, p)
+            c.restore()
+        }
+        p.color = C.WHITE; p.textSize = h * 0.30f
+        c.drawText(label, w / 2, h / 2 + p.textSize * 0.36f, p)
+    }
+}
+
 class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, val jaw: Boolean) : Screen {
     override val view = FrameLayout(act)
 
@@ -58,8 +83,7 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
     private val nameTv: TextView
     private val labelTv: TextView
     private val timeTv: TextView
-    private val bar = BarView(act, C.CARD2, C.REDB)
-    private val pauseBtn: TextView
+    private val pauseBtn: PillButton
     private val restTime: TextView
     private val restNext: TextView
     private val restNextTime: TextView
@@ -91,20 +115,19 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
             background = act.ripple(act.round(0x66000000, 22f)); setOnClickListener { showInfo() }
         }
         stage.addView(help, fl(act.dp(44), act.dp(44), Gravity.TOP or Gravity.END).also { it.setMargins(0, act.dp(12), act.dp(12), 0) })
-        work.addView(stage, lp(MATCH, 0, 1f).also { it.setMargins(act.dp(16), act.dp(8), act.dp(16), 0) })
+        work.addView(stage, lp(MATCH, 0, 1f).also { it.setMargins(act.dp(10), act.dp(4), act.dp(10), 0) })
 
-        nameTv = act.tv("", 24f, C.WHITE, HEAD, Gravity.CENTER).apply { letterSpacing = 0.04f }
-        work.addView(nameTv, lp(MATCH, WRAP).also { it.topMargin = act.dp(16) })
+        nameTv = act.tv("", 22f, C.WHITE, HEAD, Gravity.CENTER).apply { letterSpacing = 0.04f }
+        work.addView(nameTv, lp(MATCH, WRAP).also { it.topMargin = act.dp(12) })
         labelTv = act.tv("", 12f, C.RED, HEAD, Gravity.CENTER).apply { letterSpacing = 0.2f }
         work.addView(labelTv, lp(MATCH, WRAP).also { it.topMargin = act.dp(6) })
 
         val panel = FrameLayout(act).apply { background = act.round(C.CARD, 24f) }
-        timeTv = act.tv("00:00", 68f, C.WHITE, HEAD, Gravity.CENTER)
-        panel.addView(timeTv, fl(MATCH, WRAP, Gravity.CENTER).also { it.bottomMargin = act.dp(8) })
-        panel.addView(bar, fl(MATCH, act.dp(6), Gravity.BOTTOM).also { it.setMargins(act.dp(20), 0, act.dp(20), act.dp(16)) })
-        work.addView(panel, lp(MATCH, act.dp(124)).also { it.setMargins(act.dp(16), act.dp(10), act.dp(16), 0) })
+        timeTv = act.tv("00:00", 60f, C.WHITE, HEAD, Gravity.CENTER)
+        panel.addView(timeTv, fl(MATCH, WRAP, Gravity.CENTER))
+        work.addView(panel, lp(MATCH, act.dp(96)).also { it.setMargins(act.dp(16), act.dp(10), act.dp(16), 0) })
 
-        pauseBtn = act.button("PAUSE", C.RED, C.WHITE, 17f, 58, 29f).apply { setOnClickListener { togglePause() } }
+        pauseBtn = PillButton(act).apply { setOnClickListener { togglePause() } }
         work.addView(pauseBtn, lp(MATCH, act.dp(58)).also { it.setMargins(act.dp(16), act.dp(14), act.dp(16), 0) })
 
         val nav = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER }
@@ -195,7 +218,7 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
         restNext.text = n.title
         restNextTime.text = fmtTime(n.sec)
         restCount.text = "NEXT  ${idx + 2}/${steps.size}"
-        restQuote.text = "\u201C" + Data.quoteFor(day) + "\u201D"
+        restQuote.text = "\u201C" + Data.quoteFor(day) + "\u201D\n" + Data.authorFor(day).uppercase()
         begin(sec * 1000L)
         buzz(30)
         act.speaker.say("Rest. Next, ${n.title.lowercase()}.")
@@ -205,7 +228,7 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
         val e = s()
         fig.ex = e.ex; fig.mirror = e.mirror; fig.playing = true
         nameTv.text = e.title
-        paused = false; pauseBtn.text = "PAUSE"
+        paused = false; pauseBtn.label = "PAUSE"; pauseBtn.fraction = 0f
     }
 
     private fun begin(ms: Long) {
@@ -229,7 +252,7 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
         val frac = 1f - remMs.toFloat() / totalMs
         when (st) {
             St.REST -> restTime.text = fmtTime(sec)
-            else -> { timeTv.text = fmtTime(sec); bar.fraction = frac }
+            else -> { timeTv.text = fmtTime(sec); pauseBtn.fraction = frac }
         }
         if (sec != lastSec) {
             lastSec = sec
@@ -290,7 +313,7 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
         paused = p
         if (!p) { endAt = SystemClock.elapsedRealtime() + remMs; lastTick = SystemClock.elapsedRealtime() }
         fig.playing = !p; restFig.playing = !p
-        pauseBtn.text = if (p) "RESUME" else "PAUSE"
+        pauseBtn.label = if (p) "RESUME" else "PAUSE"
         if (p) act.speaker.stop()
         tick()
     }

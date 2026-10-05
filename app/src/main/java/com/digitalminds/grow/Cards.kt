@@ -175,11 +175,11 @@ object InfoSheet {
         val fig = FigureView(act).also { it.ex = ex; it.mirror = mirror && ex.sided; it.radiusDp = 22f }
         stage.addView(fig, fl(MATCH, MATCH))
         root.addView(stage, lp(MATCH, act.dp(260)))
-        root.addView(act.tv(ex.name, 22f, C.WHITE, HEAD).also { it.letterSpacing = 0.04f; it.margins(t = act.dp(16)) })
-        root.addView(act.tv(Data.sectionLabel(if (ex.pillar == "W") 'W' else ex.pillar[0]).uppercase(), 11f, C.RED, HEAD).also { it.letterSpacing = 0.15f; it.margins(t = act.dp(4)) })
+        root.addView(act.tv(ex.nameEs, 22f, C.WHITE, HEAD).also { it.letterSpacing = 0.04f; it.margins(t = act.dp(16)) })
+        root.addView(act.tv(Data.sectionEs(ex.pillar[0]), 11f, C.RED, HEAD).also { it.letterSpacing = 0.15f; it.margins(t = act.dp(4)) })
         root.addView(act.tv(ex.desc, 15f, C.GRAY, BODY).also { it.margins(t = act.dp(12)); it.setLineSpacing(act.dp(3).toFloat(), 1f) })
         for (t in ex.tips) root.addView(act.tv("•  $t", 14f, C.WHITE, BODY).also { it.margins(t = act.dp(8)) })
-        root.addView(act.button("CLOSE", C.RED, C.WHITE, 15f, 52).also { it.margins(t = act.dp(18)); it.setOnClickListener { d.dismiss() } }, lp(MATCH, act.dp(52)))
+        root.addView(act.button("CERRAR", C.RED, C.WHITE, 15f, 52).also { it.margins(t = act.dp(18)); it.setOnClickListener { d.dismiss() } }, lp(MATCH, act.dp(52)))
         val sv = ScrollView(act).apply { addView(root); isVerticalScrollBarEnabled = false }
         d.setContentView(sv)
         d.window?.apply {

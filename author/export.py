@@ -1,6 +1,9 @@
 import sys, json, math, os, datetime
 sys.path.insert(0,'.')
 import ex1, ex2, ex3
+import overrides1
+import overrides2
+import overrides3
 from build import EX, prepare
 from figure import FLOOR
 
@@ -18,8 +21,10 @@ for e in EX:
         poses.append([r(Q["hip"][0]), r(Q["hip"][1]), r(Q["t"],1), r(Q["h"],1), r(Q["hf"]*s,4),
                       r(Q["un"],1), r(Q["fn"],1), r(Q["uf"],1), r(Q["ff"],1),
                       r(Q["tn"],1), r(Q["sn"],1), r(Q["tf"],1), r(Q["sf"],1),
-                      r(Q["jaw"],1), r(Q["fo"],1), r(Q["fof"],1), (-999 if Q.get("rope") is None else r(Q["rope"],1))])
-    d = dict(id=e["id"], n=e["name"], d=e["desc"], t=e["tips"], p=e["pillar"], m=e["met"], sd=int(e["sided"]), lv=e["lvl"],
+                      r(Q["jaw"],1), r(Q["fo"],1), r(Q["fof"],1), (-999 if Q.get("rope") is None else r(Q["rope"],1)),
+                      r(Q["kn"],2), r(Q["kf"],2), r(Q["cn"],2), r(Q["cf"],2)])
+    ES = json.load(open("es.json"))
+    d = dict(id=e["id"], n=e["name"].replace("-"," "), es=ES[e["id"]][0], d=ES[e["id"]][1], t=ES[e["id"]][2], p=e["pillar"], m=e["met"], sd=int(e["sided"]), lv=e["lvl"],
              lp=e["loop"], ez=e["ease"], fr=int(e["front"]), bu=int(e["bust"]), sc=r(s,3),
              bar=(r(pr["bar"],3) if "bar" in pr else -1), wall=(r(pr["wall"],3) if "wall" in pr else -1),
              mat=(pr["mat"] if "mat" in pr else None), rp=int(e["rope"]), ps=poses)
@@ -65,6 +70,24 @@ def work(d, ph, deload):
     if deload: w*=0.8
     return int(round(w/5.0)*5)
 
+
+DUR = {"march":(30,60),"armcirc":(30,45),"jj":(30,60),"legswing":(20,30),"highknee":(20,45),"buttkick":(30,45),"rope":(30,90),
+ "squatjump":(20,45),"lungejump":(20,45),"mclimb":(20,45),"burpee":(20,40),"hang":(15,45),"kneeraise":(15,35),"cobra":(30,60),
+ "child":(30,75),"catcow":(30,60),"knees2chest":(30,60),"elongate":(30,60),"plank":(20,60),"wallangel":(30,60),"wallstand":(30,90),
+ "reach":(30,45),"deadbug":(30,50),"birddog":(30,60),"superman":(20,45),"bridge":(30,50),"calf":(30,45),"quadstretch":(30,45),
+ "hipflex":(30,50),"hamfold":(30,60),"sidebend":(30,50),"chestopen":(30,45),"chintuck":(40,60),"jawopen":(40,50),"jawresist":(40,50),
+ "necktilt":(40,50),"neckflex":(40,50),"tonguepos":(45,90),"jawmassage":(40,60)}
+CUR = {"d":1,"dl":False}
+def dsec(i):
+    lo,hi = DUR[i]
+    d = CUR["d"]
+    p = min(1.0, (d-1)/540.0)
+    p = p**0.85
+    v = lo + (hi-lo)*p
+    if phase(d)==4: v = v*0.92
+    if CUR["dl"]: v *= 0.8
+    return max(15, int(round(v/5.0)*5))
+
 def pick(lst, n, seed):
     out=[]; k=seed
     for _ in range(n):
@@ -77,6 +100,7 @@ def pick(lst, n, seed):
 def steps_for(ids, w, ph):
     res=[]
     for i in ids:
+        w=dsec(i)
         if SIDED[i]:
             res.append((i,w,5,0)); res.append((i,w,-1,1))
         else:
@@ -106,6 +130,7 @@ def session(d, date):
     if wd==5: return None
     ph = phase(d); week=(d-1)//7; deload = (week%4==3 and week>0)
     w = work(d, ph, deload)
+    CUR['d']=d; CUR['dl']=deload
     seed = week*3 + wd
     pools = dict(W=pool(WARM,ph), I=pool(IMPACT,ph), C=pool(CORE,ph), D=pool(DECOMP,ph), F=pool(FLEX,ph))
     off = dict(W=0,I=1,C=2,D=3,F=4)
@@ -120,8 +145,9 @@ def session(d, date):
             ids = pick(pools[b], n, seed+off[b])
             if b=="W":
                 for i in ids:
-                    if SIDED[i]: blk += [(i,w,5,0),(i,w,-1,1)]
-                    else: blk.append((i,w,-1,0))
+                    wi=dsec(i)
+                    if SIDED[i]: blk += [(i,wi,5,0),(i,wi,-1,1)]
+                    else: blk.append((i,wi,-1,0))
             else:
                 blk = steps_for(ids,w,ph)
         tag = "W" if b=="W" else ("R" if b in "RX" else b)
@@ -162,7 +188,8 @@ for d in range(1,TOTAL+1):
     warm=pick(["neckflex","necktilt"],2 if ph>=0 else 1,wd+week)
     ids=warm+mm+["jawmassage"]
     if ph==3: ids=ids+["tonguepos"] if ids[-2]!="tonguepos" else ids+["chintuck"]
-    steps=[(i,w,-1,0,"J") for i in ids]
+    CUR["d"]=d; CUR["dl"]=False
+    steps=[(i,dsec(i),-1,0,"J") for i in ids]
     enc=",".join(f"{index[i]}:{sec}:{rs}:{fl}:{tg}" for (i,sec,rs,fl,tg) in steps)
     jlines.append(enc); jstats.append((ph,dur(steps,8)/60.0))
 open(os.path.join(OUT,"jaw.txt"),"w").write("\n".join(jlines))

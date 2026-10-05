@@ -10,15 +10,16 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-enum class Ic { BACK, GEAR, CHART, PAUSE, PLAY, PREV, NEXT, CHECK, CLOSE }
+enum class Ic { BACK, GEAR, CHART, PAUSE, PLAY, PREV, NEXT, CHECK, CLOSE, SLIDERS, BARS }
 
 class IconView(ctx: Context, var kind: Ic, var color: Int = C.WHITE) : View(ctx) {
+    var scale = 1f
     private val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND; strokeJoin = Paint.Join.ROUND }
     private val f = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private val path = Path()
 
     override fun onDraw(c: Canvas) {
-        val w = width.toFloat(); val h = height.toFloat(); val s = minOf(w, h)
+        val w = width.toFloat(); val h = height.toFloat(); val s = minOf(w, h) * scale
         val cx = w / 2; val cy = h / 2
         p.color = color; f.color = color; p.strokeWidth = s * 0.09f
         when (kind) {
@@ -46,6 +47,19 @@ class IconView(ctx: Context, var kind: Ic, var color: Int = C.WHITE) : View(ctx)
                 path.reset(); path.moveTo(cx + s * .2f, cy - s * .22f); path.lineTo(cx - s * .12f, cy); path.lineTo(cx + s * .2f, cy + s * .22f); path.close(); c.drawPath(path, f) }
             Ic.NEXT -> { c.drawLine(cx + s * .22f, cy - s * .2f, cx + s * .22f, cy + s * .2f, p)
                 path.reset(); path.moveTo(cx - s * .2f, cy - s * .22f); path.lineTo(cx + s * .12f, cy); path.lineTo(cx - s * .2f, cy + s * .22f); path.close(); c.drawPath(path, f) }
+            Ic.SLIDERS -> {
+                p.strokeWidth = s * .075f
+                val ys = floatArrayOf(-.30f, 0f, .30f); val ks = floatArrayOf(-.14f, .20f, -.02f)
+                for (i in 0..2) {
+                    c.drawLine(cx - s * .46f, cy + ys[i] * s, cx + s * .46f, cy + ys[i] * s, p)
+                    f.color = color; c.drawCircle(cx + ks[i] * s, cy + ys[i] * s, s * .105f, f)
+                }
+            }
+            Ic.BARS -> {
+                p.strokeWidth = s * .15f
+                val hs = floatArrayOf(.30f, .52f, .76f); val xs = floatArrayOf(-.26f, 0f, .26f)
+                for (i in 0..2) c.drawLine(cx + xs[i] * s, cy + s * .38f, cx + xs[i] * s, cy + s * .38f - hs[i] * s, p)
+            }
             Ic.CHECK -> { p.strokeWidth = s * .13f; path.reset(); path.moveTo(cx - s * .22f, cy); path.lineTo(cx - s * .06f, cy + s * .17f); path.lineTo(cx + s * .24f, cy - s * .18f); c.drawPath(path, p) }
         }
     }

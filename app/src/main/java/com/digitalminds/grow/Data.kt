@@ -33,7 +33,7 @@ object Data {
                 o.getInt("fr") == 1, o.getInt("bu") == 1, o.getDouble("sc").toFloat(),
                 o.getDouble("bar").toFloat(), o.getDouble("wall").toFloat(),
                 mat?.getDouble(0)?.toFloat() ?: 0f, mat?.getDouble(1)?.toFloat() ?: 0f, mat != null,
-                o.getInt("rp") == 1, poses
+                o.getInt("rp") == 1, poses, o.optString("es", o.getString("n"))
             )
         }
         plan = ctx.assets.open("plan.txt").bufferedReader().use { it.readLines() }
@@ -82,60 +82,66 @@ object Data {
         'C' -> "Core & posture"; 'F' -> "Flexibility"; 'J' -> "Jaw & neck"; else -> ""
     }
 
+    class Quote(val text: String, val author: String)
+
+    /** One quote per month, starting October 2026. Themes: universe, life, philosophy, growth mindset, business, investing, study, discipline. */
     val quotes = arrayOf(
-        "Stand tall in small moments and the big ones will follow.",
-        "Patience is a quiet kind of strength.",
-        "Today's effort is tomorrow's posture.",
-        "Grow like a tree: slowly, deeply, without apology.",
-        "Discipline is a promise you keep when no one is watching.",
-        "Small steps still leave footprints.",
-        "Rest is not the opposite of effort, it is its partner.",
-        "Be the person your future self thanks.",
-        "Strength grows where comfort ends.",
-        "A calm mind carries a tall spine.",
-        "Every repetition is a vote for who you are becoming.",
-        "Consistency turns ordinary days into extraordinary years.",
-        "Pause to breathe, never to surrender.",
-        "Reach higher, root deeper.",
-        "The body keeps the score of every honest effort.",
-        "You do not need motivation, only the next minute.",
-        "Quiet work builds loud results.",
-        "Be gentle with the process, firm with the habit.",
-        "Growth is the sum of days nobody applauds.",
-        "Your only rival is yesterday's version of you.",
-        "Stillness is also a way of moving forward.",
-        "Show up, even when it is small.",
-        "Height of body, height of character.",
-        "What you repeat, you become.",
-        "Let your effort be steady and your spirit light.",
-        "A long road is walked one stride at a time.",
-        "Discipline is freedom wearing work clothes.",
-        "Breathe in patience, breathe out doubt.",
-        "Strong foundations are built unseen.",
-        "Do it for the person you will be in ten years.",
-        "The best session is the one you finish.",
-        "Rise early in spirit, even if the clock disagrees.",
-        "Progress whispers; keep listening.",
-        "Make today's version of effort count.",
-        "A tall life starts with a straight back.",
-        "Sleep well, eat well, train well, repeat.",
-        "Courage is just consistency with a heartbeat.",
-        "The mountain is climbed by those who keep walking.",
-        "Respect the rest day, it is where you grow.",
-        "Be proud of the work, not only the result.",
-        "Even slow growth is growth.",
-        "Your habits are quietly writing your story.",
-        "Move with purpose, recover with intention.",
-        "Be steady like roots and open like branches.",
-        "Today is a good day to be a little better.",
-        "Effort is a language everyone understands.",
-        "Hold your head high, but keep your heart humble.",
-        "The strongest lift is the first step out the door.",
-        "Nothing great is built in a hurry.",
-        "Keep going, the view improves with every climb.",
-        "You are not behind, you are becoming."
+        Quote("We are a way for the cosmos to know itself.", "Carl Sagan"),
+        Quote("The unexamined life is not worth living.", "Socrates"),
+        Quote("Becoming is better than being.", "Carol Dweck"),
+        Quote("Spend each day trying to be a little wiser than you were when you woke up.", "Charlie Munger"),
+        Quote("The journey of a thousand miles begins with a single step.", "Lao Tzu"),
+        Quote("Discipline is the bridge between goals and accomplishment.", "Jim Rohn"),
+        Quote("Imagination is more important than knowledge.", "Albert Einstein"),
+        Quote("The impediment to action advances action. What stands in the way becomes the way.", "Marcus Aurelius"),
+        Quote("Risk comes from not knowing what you're doing.", "Warren Buffett"),
+        Quote("You do not rise to the level of your goals. You fall to the level of your systems.", "James Clear"),
+        Quote("Look up at the stars and not down at your feet.", "Stephen Hawking"),
+        Quote("He who has a why to live can bear almost any how.", "Friedrich Nietzsche"),
+        Quote("Stay hungry. Stay foolish.", "Steve Jobs"),
+        Quote("The first principle is that you must not fool yourself, and you are the easiest person to fool.", "Richard Feynman"),
+        Quote("We suffer more often in imagination than in reality.", "Seneca"),
+        Quote("Someone is sitting in the shade today because someone planted a tree a long time ago.", "Warren Buffett"),
+        Quote("Knowing is not enough; we must apply. Willing is not enough; we must do.", "Johann Wolfgang von Goethe"),
+        Quote("Life is like riding a bicycle. To keep your balance, you must keep moving.", "Albert Einstein"),
+        Quote("Men are disturbed not by things, but by the views they take of them.", "Epictetus"),
+        Quote("The big money is not in the buying and selling, but in the waiting.", "Charlie Munger"),
+        Quote("I've failed over and over and over again in my life. And that is why I succeed.", "Michael Jordan"),
+        Quote("Nothing great was ever achieved without enthusiasm.", "Ralph Waldo Emerson"),
+        Quote("It is not that we have a short time to live, but that we waste a lot of it.", "Seneca"),
+        Quote("Do not let what you cannot do interfere with what you can do.", "John Wooden"),
+        Quote("The investor's chief problem, and even his worst enemy, is likely to be himself.", "Benjamin Graham"),
+        Quote("Grit is passion and perseverance for very long-term goals.", "Angela Duckworth"),
+        Quote("Your time is limited, so don't waste it living someone else's life.", "Steve Jobs"),
+        Quote("Earn with your mind, not your time.", "Naval Ravikant"),
+        Quote("Waste no more time arguing what a good man should be. Be one.", "Marcus Aurelius"),
+        Quote("I learned that courage was not the absence of fear, but the triumph over it.", "Nelson Mandela"),
+        Quote("An investment in knowledge pays the best interest.", "Benjamin Franklin"),
+        Quote("Be quick, but don't hurry.", "John Wooden"),
+        Quote("First say to yourself what you would be; and then do what you have to do.", "Epictetus"),
+        Quote("Do what you can, with what you have, where you are.", "Theodore Roosevelt"),
+        Quote("If you have a garden and a library, you have everything you need.", "Cicero"),
+        Quote("Somewhere, something incredible is waiting to be known.", "Carl Sagan"),
+        Quote("The roots of education are bitter, but the fruit is sweet.", "Aristotle"),
+        Quote("The beginning is the most important part of the work.", "Plato"),
+        Quote("Nothing in life is to be feared, it is only to be understood.", "Marie Curie"),
+        Quote("Success is a lousy teacher.", "Bill Gates"),
+        Quote("The best investment you can make is in yourself.", "Warren Buffett"),
+        Quote("The last of the human freedoms: to choose one's attitude in any given set of circumstances.", "Viktor Frankl"),
+        Quote("The only way to do great work is to love what you do.", "Steve Jobs")
     )
-    fun quoteFor(day: Int): String = quotes[(((day - 1) / 7) % quotes.size)]
+
+    private fun monthIndex(day: Int): Int {
+        val dt = dateOf(day.coerceAtLeast(1))
+        return ((dt.year - 2026) * 12 + dt.monthValue - 10).coerceIn(0, quotes.size - 1)
+    }
+    fun quoteFor(day: Int): String = quotes[monthIndex(day)].text
+    fun authorFor(day: Int): String = quotes[monthIndex(day)].author
+
+    fun sectionEs(tag: Char): String = when (tag) {
+        'W' -> "CALENTAMIENTO"; 'I' -> "IMPACTO"; 'R' -> "CARRERA"; 'D' -> "DESCOMPRESIÓN"
+        'C' -> "CORE Y POSTURA"; 'F' -> "FLEXIBILIDAD"; 'J' -> "MANDÍBULA Y CUELLO"; else -> ""
+    }
 
     fun focusOf(day: Int, jaw: Boolean): String {
         if (jaw) return "JAW & NECK MOBILITY"

@@ -54,10 +54,10 @@ class HomeScreen(val act: MainActivity) : Screen {
         val head = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
         val logo = android.widget.ImageView(act).apply { setImageResource(R.drawable.dm_logo); adjustViewBounds = true; scaleType = android.widget.ImageView.ScaleType.FIT_START }
         head.addView(logo, lp(0, act.dp(26), 1f).also { it.rightMargin = act.dp(60) })
-        val chart = IconView(act, Ic.CHART).apply { setOnClickListener { act.showProgress() } }
-        val gear = IconView(act, Ic.GEAR).apply { setOnClickListener { act.showSettings() } }
-        head.addView(chart, lp(act.dp(44), act.dp(44)))
-        head.addView(gear, lp(act.dp(44), act.dp(44)))
+        val chart = IconView(act, Ic.BARS, C.GRAY).apply { scale = 0.52f; background = act.round(C.CARD, 18f); setOnClickListener { act.showProgress() } }
+        val gear = IconView(act, Ic.SLIDERS, C.GRAY).apply { scale = 0.52f; background = act.round(C.CARD, 18f); setOnClickListener { act.showSettings() } }
+        head.addView(chart, lp(act.dp(34), act.dp(34)).also { it.rightMargin = act.dp(8) })
+        head.addView(gear, lp(act.dp(34), act.dp(34)))
         col.addView(head)
 
         // tabs
@@ -92,6 +92,7 @@ class HomeScreen(val act: MainActivity) : Screen {
                 if (!rest) hero.addView(act.tv(Data.focusOf(day, jaw), 13f, C.WHITE, HEAD).also { it.letterSpacing = 0.1f; it.margins(t = act.dp(10)) })
                 val q = if (rest) "Your body grows while you recover. Sleep well and eat well." else Data.quoteFor(day)
                 hero.addView(act.tv("\u201C$q\u201D", 14f, C.GRAY, Typeface.create(BODY, Typeface.ITALIC)).also { it.margins(t = act.dp(14)); it.setLineSpacing(act.dp(3).toFloat(), 1f) })
+                if (!rest) hero.addView(act.tv(Data.authorFor(day).uppercase(), 11f, C.DIM, HEAD).also { it.letterSpacing = 0.14f; it.margins(t = act.dp(8)) })
             }
         }
         col.addView(hero.also { it.margins(t = act.dp(14)) })
@@ -146,7 +147,7 @@ class HomeScreen(val act: MainActivity) : Screen {
             background = act.ripple(act.round(C.CARD, 18f)); setPadding(act.dp(10), act.dp(8), act.dp(16), act.dp(8))
         }
         val fig = FigureView(act).apply { ex = r.ex; still = r.ex.repPos(); mirror = r.mirror; radiusDp = 14f }
-        row.addView(fig, lp(act.dp(76), act.dp(88)))
+        row.addView(fig, lp(act.dp(92), act.dp(104)))
         val mid = LinearLayout(act).apply { orientation = LinearLayout.VERTICAL }
         mid.addView(act.tv(r.title, 15f, C.WHITE, HEAD).also { it.letterSpacing = 0.03f })
         if (r.note.isNotEmpty()) mid.addView(act.tv(r.note, 12f, C.DIM, BODY).also { it.margins(t = act.dp(3)) })

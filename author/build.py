@@ -8,7 +8,7 @@ EX = []   # list of exercise dicts
 def P(**k): return k
 
 def E(id, name, pillar, met, desc, tips, poses, loop=1.0, ease=1, sided=False, lvl=1, anchor="hip", ax=0.5,
-      bar=False, wall=None, mat=False, front=False, bust=False, smax=1.35, rope=False, hold=False):
+      bar=False, wall=None, mat=False, front=False, bust=False, smax=1.5, rope=False, hold=False):
     EX.append(dict(id=id,name=name,pillar=pillar,met=met,desc=desc,tips=tips,poses=poses,loop=loop,ease=ease,sided=sided,
                    lvl=lvl,anchor=anchor,ax=ax,bar=bar,wall=wall,mat=mat,front=front,bust=bust,smax=smax,rope=rope,hold=hold))
 
@@ -48,7 +48,7 @@ def prepare(e):
             T = lambda x,y: ((x-cx)*s+0.5, (y-y1)*s+0.84)
         else:
             bh = FLOOR - y0
-            s = min(0.90/bw, 0.82/bh, e["smax"])
+            s = min(0.94/bw, 0.88/bh, e["smax"])
             cx = (x0+x1)/2
             T = lambda x,y: ((x-cx)*s+0.5, (y-FLOOR)*s+0.90)
     out = []
