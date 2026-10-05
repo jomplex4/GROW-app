@@ -38,6 +38,28 @@ fun main(args: Array<String>) {
         exs.add(Ex(h[1], h[2], "", emptyList(), "", 0f, false, h[6].toFloat(), h[7].toInt(), h[3] == "1", h[4] == "1", h[5].toFloat(),
             h[8].toFloat(), h[9].toFloat(), h[11].toFloat(), h[12].toFloat(), h[10] == "1", h[13] == "1", poses))
     }
+    if (args.getOrNull(0) == "ref") {
+        val e = exs.first { it.id == args[1] }
+        Pal.floorLine = 0; Pal.shadow = 0
+        val cw = 1024; val ch = 1024
+        val im = BufferedImage(cw * 2, ch * 3, BufferedImage.TYPE_INT_RGB)
+        val g0 = im.createGraphics()
+        g0.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g0.color = Color(0xD9, 0xD9, 0xD9); g0.fillRect(0, 0, im.width, im.height)
+        val rr = FigureRenderer()
+        for (k in 0 until 6) {
+            val gg = g0.create() as Graphics2D
+            gg.translate((k % 2) * cw, (k / 2) * ch)
+            gg.clip = Rectangle(0, 0, cw, ch)
+            val zm = (args.getOrNull(3) ?: "1.0").toDouble()
+            gg.translate(cw / 2.0, ch * 0.92); gg.scale(zm, zm); gg.translate(-cw / 2.0, -ch * 0.92)
+            gg.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+            rr.draw(G2(gg), e, k / 6f, cw.toFloat(), ch.toFloat(), false, false, 0f)
+            gg.dispose()
+        }
+        g0.dispose()
+        ImageIO.write(im, "png", File(args[2])); println("ref done"); return
+    }
     if (args.getOrNull(0) == "frames") {
         val ids2 = args[1].split(',').filter { it.isNotBlank() }
         val nf = args[2].toInt(); val dir = File(args[3]); dir.mkdirs()

@@ -39,25 +39,9 @@ class Store(ctx: Context) {
     }
     fun totalDone(jaw: Boolean) = setOf(key(jaw)).size
 
-    fun streak(today: Int, jaw: Boolean): Int {
-        val s = setOf(key(jaw))
-        var d = if (s.contains(today)) today else today - 1
-        var n = 0
-        while (d >= 1) {
-            if (Data.isRest(d)) { d--; continue }
-            if (s.contains(d)) { n++; d-- } else break
-        }
-        return n
-    }
+    fun streak(today: Int, jaw: Boolean): Int = Logic.streak(setOf(key(jaw)), today) { Data.isRest(it) }
 
-    fun bestStreak(jaw: Boolean): Int {
-        val s = setOf(key(jaw)); var best = 0; var cur = 0
-        for (d in 1..Data.TOTAL) {
-            if (Data.isRest(d)) continue
-            if (s.contains(d)) { cur++; if (cur > best) best = cur } else cur = 0
-        }
-        return best
-    }
+    fun bestStreak(jaw: Boolean): Int = Logic.bestStreak(setOf(key(jaw)), Data.TOTAL) { Data.isRest(it) }
 
     /** Days (Mon..Sun) of the week containing 'date' that are done, as booleans. */
     fun weekDone(date: LocalDate, jaw: Boolean): BooleanArray {

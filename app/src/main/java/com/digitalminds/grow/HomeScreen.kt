@@ -12,6 +12,7 @@ class Row(val ex: Ex, val title: String, val seconds: Int, val tag: Char, val no
 
 class HomeScreen(val act: MainActivity) : Screen {
     override val view = FrameLayout(act)
+    val builtDay = act.today
 
     init {
         view.setBackgroundColor(C.BG)
@@ -146,7 +147,9 @@ class HomeScreen(val act: MainActivity) : Screen {
             orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
             background = act.ripple(act.round(C.CARD, 18f)); setPadding(act.dp(10), act.dp(8), act.dp(16), act.dp(8))
         }
-        val fig = FigureView(act).apply { ex = r.ex; still = r.ex.repPos(); mirror = r.mirror; radiusDp = 14f }
+        val tb = Sprites.thumb(act, r.ex.id)
+        val fig: View = if (tb != null) ThumbView(act, tb)
+            else FigureView(act).apply { ex = r.ex; still = r.ex.repPos(); mirror = r.mirror; radiusDp = 14f }
         row.addView(fig, lp(act.dp(92), act.dp(104)))
         val mid = LinearLayout(act).apply { orientation = LinearLayout.VERTICAL }
         mid.addView(act.tv(r.title, 15f, C.WHITE, HEAD).also { it.letterSpacing = 0.03f })

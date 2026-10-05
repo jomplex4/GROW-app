@@ -201,7 +201,12 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
         act.speaker.say("Get ready. First, ${s().title.lowercase()}.")
     }
 
+    private fun warmNext() {
+        if (idx + 1 < steps.size) Sprites.load(act, steps[idx + 1].ex.id) { }
+    }
+
     private fun startWork() {
+        warmNext()
         st = St.WORK
         showWork(); refreshSegments(); bindExercise()
         labelTv.text = ""

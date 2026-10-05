@@ -26,7 +26,8 @@ class MainActivity : Activity() {
         setContentView(root)
         window.statusBarColor = C.BG; window.navigationBarColor = C.BG
         if (store.reminder >= 0) Reminder.schedule(this, store.reminder)
-        showHome()
+        swap(SplashScreen(this))
+        root.postDelayed({ if (!isFinishing && screen is SplashScreen) showHome() }, 1050L)
     }
 
     private fun swap(s: Screen) {
@@ -51,8 +52,15 @@ class MainActivity : Activity() {
 
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
+        if (screen is SplashScreen) { super.onBackPressed(); return }
         if (screen?.onBack() == true) return
         if (screen !is HomeScreen) showHome() else super.onBackPressed()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // if the app stayed open past midnight (or the phone date changed), show the right day
+        (screen as? HomeScreen)?.let { if (it.builtDay != today) showHome() }
     }
 
     override fun onPause() { screen?.onPause(); super.onPause() }

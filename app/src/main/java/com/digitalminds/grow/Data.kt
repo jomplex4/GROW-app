@@ -17,6 +17,7 @@ object Data {
 
     fun load(ctx: Context) {
         if (loaded) return
+        Sprites.init(ctx)
         val arr = JSONArray(ctx.assets.open("exercises.json").bufferedReader().use { it.readText() })
         exercises = Array(arr.length()) { i ->
             val o = arr.getJSONObject(i)
