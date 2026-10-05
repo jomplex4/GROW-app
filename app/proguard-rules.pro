@@ -1,0 +1,2 @@
+-dontwarn kotlin.**
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics { *; }
