@@ -64,5 +64,10 @@ class MainActivity : Activity() {
     }
 
     override fun onPause() { screen?.onPause(); super.onPause() }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) Sprites.trim()
+    }
     override fun onDestroy() { screen?.onDestroy(); speaker.shutdown(); super.onDestroy() }
 }

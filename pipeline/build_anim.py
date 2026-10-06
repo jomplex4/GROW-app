@@ -210,7 +210,7 @@ def crossfade(A, B, n):
 def save_webp(f, path, q=80):
     f = f.copy(); f[..., :3] = sharpen(f[..., :3])
     im = Image.fromarray(np.clip(f, 0, 255).astype(np.uint8), 'RGBA')
-    im.save(path, 'WEBP', quality=q, method=6, alpha_quality=85)
+    im.save(path, 'WEBP', quality=q, method=6, alpha_quality=70)
     return os.path.getsize(path)
 
 def frames_for(key_pils, mode='flow', cfg=None, flips=None):

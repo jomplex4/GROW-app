@@ -8,9 +8,9 @@ E("march","MARCH IN PLACE","W",3.5,
    P(t=3,tf=85,sf=0,tn=0,sn=0,un=45,fn=115,uf=-30,ff=20)], loop=1.0, ease=1)
 
 arm=lambda a,lag=30: dict(un=a,fn=a,uf=a-lag,ff=a-lag)
-E("armcirc","ARM CIRCLES","W",3.0,
-  "Stand tall and swing both straight arms in big, smooth circles. Reverse the direction halfway.",
-  ["Move from the shoulders, not the wrists.","Keep your neck long and ribs down."],
+E("armcirc","ARM SWINGS","W",3.0,
+  "Stand tall and swing both straight arms forward and up overhead, then lower them with control.",
+  ["Move from the shoulders, keep the elbows straight.","Keep your neck long and ribs down."],
   [P(t=0,**arm(0)),P(t=0,**arm(90)),P(t=0,**arm(180)),P(t=0,**arm(270))], loop=2.0, ease=0)
 
 E("jj","JUMPING JACKS","W",8.0,

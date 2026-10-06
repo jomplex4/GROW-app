@@ -82,6 +82,20 @@ fun main() {
     var last = Seq.smoothPos(0f)
     for (k in 1..1000) { val p = Seq.smoothPos(k / 1000f); check(Math.abs(p - last) < 0.03f, "smoothPos jump at $k"); last = p }
 
+    // cosPos: plain ping-pong, no pause at the ends
+    check(Seq.cosPos(0f) == 0f && Math.abs(Seq.cosPos(0.5f) - 1f) < 1e-6f && Math.abs(Seq.cosPos(1f)) < 1e-6f, "cosPos ends")
+    var lastC = Seq.cosPos(0f)
+    for (k in 1..1000) { val p = Seq.cosPos(k / 1000f); check(p in 0f..1f, "cosPos range"); check(Math.abs(p - lastC) < 0.02f, "cosPos jump $k"); lastC = p }
+
+    // profile: starts and ends at the start pose, reaches 1 and holds, continuous
+    for ((ri, ho, fa) in listOf(Triple(.3f, .4f, .2f), Triple(.45f, .05f, .45f), Triple(.5f, 0f, .5f), Triple(.35f, .25f, .3f))) {
+        check(Seq.profile(0f, ri, ho, fa) == 0f, "profile start")
+        check(Seq.profile(ri + ho / 2f, ri, ho, fa) == 1f || ho == 0f, "profile hold")
+        var lp = Seq.profile(0f, ri, ho, fa)
+        for (k in 1..2000) { val p = Seq.profile(k / 2000f, ri, ho, fa); check(p in 0f..1f, "profile range"); check(Math.abs(p - lp) < 0.02f, "profile jump $ri $k"); lp = p }
+        check(Math.abs(Seq.profile(0.9999f, ri, ho, fa)) < 0.01f, "profile returns to start")
+    }
+
     println("QA done, failures: $fails")
     if (fails > 0) System.exit(1)
 }

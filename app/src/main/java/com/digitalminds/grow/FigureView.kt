@@ -57,8 +57,15 @@ class CanvasGfx : Gfx {
 class FigureView(ctx: Context) : View(ctx) {
     var ex: Ex? = null
         set(v) {
-            field = v; t = 0f; last = 0L
-            v?.let { e -> if (Sprites.meta(e.id) != null) Sprites.load(context, e.id) { invalidate() } }
+            field = v; last = 0L; shownAt = 0L
+            // exercises that switch sides with a quick fade start just after the fade, so they never open on an empty stage
+            t = if (v != null && Sprites.meta(v.id)?.dip == true) 0.24f else 0f
+            v?.let { e ->
+                if (Sprites.meta(e.id) != null) {
+                    if (thumb) { if (active) Sprites.loadHalf(context, e.id) { invalidate() } }
+                    else Sprites.load(context, e.id) { invalidate() }
+                }
+            }
             invalidate()
         }
     var mirror = false
@@ -69,16 +76,26 @@ class FigureView(ctx: Context) : View(ctx) {
     var still = -1f
         set(v) { field = v; invalidate() }
     var radiusDp = 20f
+    /** list thumbnail: half-size frames, animated only while on screen */
+    var thumb = false
+    var active = true
+        set(v) {
+            if (field == v) return
+            field = v; last = 0L
+            if (v && thumb) ex?.let { e -> if (Sprites.meta(e.id) != null) Sprites.loadHalf(context, e.id) { invalidate() } }
+            invalidate()
+        }
 
     private var t = 0f
     private var last = 0L
+    private var shownAt = 0L
     private val gfx = CanvasGfx()
     private val renderer = FigureRenderer()
     private val bp = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
     private val dst = RectF()
 
     private fun advance(): Boolean {
-        val animate = still < 0f && playing
+        val animate = still < 0f && playing && (!thumb || active)
         val now = System.nanoTime()
         if (animate) { if (last != 0L) t += (now - last) / 1e9f; last = now } else last = 0L
         return animate
@@ -120,24 +137,50 @@ class FigureView(ctx: Context) : View(ctx) {
         val w = width.toFloat(); val h = height.toFloat()
         gfx.c = c
         gfx.gradRoundRect(0f, 0f, w, h, radiusDp * resources.displayMetrics.density, Pal.stageTop, Pal.stageBot)
-        val fr = Sprites.frames(e.id)
-        if (fr == null || fr.size < m.n) return          // still loading: stage only, redrawn when ready
-        val animate = advance()
+        val fr: Array<Bitmap>? = if (thumb) (if (active) Sprites.halfFrames(e.id) else null) else Sprites.frames(e.id)
         layout(m, w, h)
+        if (fr == null || fr.size < m.n) {
+            // list rows keep a sharp first frame in place until their animation is ready; the main screen shows the stage only
+            if (thumb) Sprites.still(context, e.id)?.let { b -> c.save(); if (mirror && e.sided) c.scale(-1f, 1f, w / 2f, h / 2f); bp.alpha = 255; c.drawBitmap(b, null, dst, bp); c.restore() }
+            return
+        }
+        val animate = advance()
+        // short fade-in the first time the frames are drawn (no pop, no blurry placeholder)
+        val now = System.nanoTime()
+        if (shownAt == 0L) shownAt = now
+        val appear = if (thumb) 1f else ((now - shownAt) / 160e6f).coerceIn(0f, 1f)
         c.save()
         if (mirror && e.sided) c.scale(-1f, 1f, w / 2f, h / 2f)
-        if (m.ground && !m.bust) {
-            bp.alpha = 255
-            gfx.oval(dst.centerX(), dst.bottom, dst.width() * 0.30f, h * 0.018f, 0x26000000)
-        }
-        val loop = if (m.alt) e.loop * 2f else e.loop
+        if (m.ground && !m.bust) gfx.oval(dst.centerX(), dst.bottom, dst.width() * 0.30f, h * 0.018f, (0x26 * appear).toInt() shl 24)
+        val loopSec = if (m.loop > 0f) m.loop else e.loop
         if (!m.step) {
-            val phase = ((t / loop) % 1f + 1f) % 1f
-            val fi = Seq.smoothPos(phase) * (m.n - 1)
-            val a = fi.toInt().coerceIn(0, m.n - 1); val b = minOf(a + 1, m.n - 1); val f = fi - a
-            blit(c, fr[a], false, if (b == a) 1f else 1f - f)
-            if (b != a && f > 0.01f) blit(c, fr[b], false, f)
+            val total = if (m.alt) loopSec * 2f else loopSec
+            val ph = ((t / total) % 1f + 1f) % 1f
+            val flip: Boolean; val local: Float
+            if (m.alt) { flip = ph >= 0.5f; local = (ph * 2f) % 1f } else { flip = false; local = ph }
+            var vis = appear
+            if (m.dip) {   // brief fade while the figure switches to the other side (it is at rest there)
+                val d = minOf(local, 1f - local) * loopSec
+                vis *= Seq.smooth(d / 0.22f)
+            }
+            if (m.breath) {   // subtle breathing so static holds never look frozen
+                val k = 1f + 0.012f * kotlin.math.sin(2.0 * Math.PI * t / 4.0).toFloat()
+                val dh = dst.height() * k
+                if (!m.ground && !m.bust) dst.bottom = dst.top + dh else dst.top = dst.bottom - dh
+            }
+            val a: Int; val b: Int; val f: Float
+            if (m.cycle) {
+                val fi = local * m.n
+                a = fi.toInt() % m.n; b = (a + 1) % m.n; f = fi - fi.toInt()
+            } else {
+                val pos = if (m.cyc) Seq.cosPos(local) else Seq.profile(local, m.ri, m.ho, m.fa)
+                val fi = pos * (m.n - 1)
+                a = fi.toInt().coerceIn(0, m.n - 1); b = minOf(a + 1, m.n - 1); f = fi - a
+            }
+            blit(c, fr[a], flip, (if (b == a) 1f else 1f - f) * vis)
+            if (b != a && f > 0.01f) blit(c, fr[b], flip, f * vis)
         } else {
+            val loop = if (m.alt) loopSec * 2f else loopSec
             val beats = Seq.beats(m.n, m.alt); val flips = Seq.flips(m.n, m.alt)
             val len = beats.size
             val perBeat = maxOf(loop / len, 0.16f)
@@ -146,27 +189,11 @@ class FigureView(ctx: Context) : View(ctx) {
             val fade = 0.30f
             val tb = if (f > 1f - fade) Seq.smooth((f - (1f - fade)) / fade) else 0f
             val nx = (i + 1) % len
-            blit(c, fr[beats[i]], flips[i], 1f - tb)
-            if (tb > 0.01f) blit(c, fr[beats[nx]], flips[nx], tb)
+            blit(c, fr[beats[i]], flips[i], (1f - tb) * appear)
+            if (tb > 0.01f) blit(c, fr[beats[nx]], flips[nx], tb * appear)
         }
         c.restore()
-        if (animate) postInvalidateOnAnimation()
-    }
-}
-
-/** Static small preview used in the exercise list. */
-class ThumbView(ctx: Context, private val bmp: Bitmap) : View(ctx) {
-    private val gfx = CanvasGfx()
-    private val p = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
-    private val r = RectF()
-    override fun onDraw(c: Canvas) {
-        val w = width.toFloat(); val h = height.toFloat()
-        gfx.c = c
-        gfx.gradRoundRect(0f, 0f, w, h, 14f * resources.displayMetrics.density, Pal.stageTop, Pal.stageBot)
-        val s = minOf(w * 0.86f / bmp.width, h * 0.86f / bmp.height)
-        val dw = bmp.width * s; val dh = bmp.height * s
-        r.set((w - dw) / 2f, h - dh - h * 0.07f, (w + dw) / 2f, h - h * 0.07f)
-        c.drawBitmap(bmp, null, r, p)
+        if (animate || appear < 1f) postInvalidateOnAnimation()
     }
 }
 

@@ -18,9 +18,7 @@ for e in ex:
     d = f'{A}/anim/{i}'
     for k in range(m['n']):
         f = f'{d}/{k:02d}.webp'; check(os.path.exists(f), f'missing {f}'); total_bytes += os.path.getsize(f) if os.path.exists(f) else 0
-    check(os.path.exists(d + '/t.webp'), f'missing thumb {i}')
-    total_bytes += os.path.getsize(d + '/t.webp') if os.path.exists(d + '/t.webp') else 0
-    extra = [f for f in os.listdir(d) if f not in [f'{k:02d}.webp' for k in range(m['n'])] + ['t.webp']]
+    extra = [f for f in os.listdir(d) if f not in [f'{k:02d}.webp' for k in range(m['n'])]]
     check(not extra, f'unexpected files in {i}: {extra}')
     check(m['w'] > 50 and m['h'] > 50 and m['n'] >= 2, f'bad meta {i}')
 check(set(meta) == set(ids), 'meta ids differ from exercises')

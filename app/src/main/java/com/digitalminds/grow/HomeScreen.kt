@@ -13,6 +13,8 @@ class Row(val ex: Ex, val title: String, val seconds: Int, val tag: Char, val no
 class HomeScreen(val act: MainActivity) : Screen {
     override val view = FrameLayout(act)
     val builtDay = act.today
+    private val thumbs = ArrayList<FigureView>()
+    private var scroller: ScrollView? = null
 
     init {
         view.setBackgroundColor(C.BG)
@@ -41,8 +43,14 @@ class HomeScreen(val act: MainActivity) : Screen {
         return out
     }
 
+    private fun updateActive() {
+        val r = android.graphics.Rect()
+        for (t in thumbs) t.active = t.isShown && t.getGlobalVisibleRect(r) && r.height() > t.height * 0.3f
+    }
+
     private fun build() {
         view.removeAllViews()
+        thumbs.clear()
         val day = act.today
         val jaw = act.jawMode
         val steps = if (day in 1..Data.TOTAL) Data.steps(day, jaw) else emptyList()
@@ -50,6 +58,9 @@ class HomeScreen(val act: MainActivity) : Screen {
         val col = LinearLayout(act).apply { orientation = LinearLayout.VERTICAL; setPadding(act.dp(20), act.dp(18), act.dp(20), act.dp(24)) }
         sv.addView(col)
         view.addView(sv, FrameLayout.LayoutParams(-1, -1))
+        scroller = sv
+        sv.setOnScrollChangeListener { _, _, _, _, _ -> updateActive() }
+        sv.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateActive() }
 
         // header
         val head = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
@@ -147,9 +158,12 @@ class HomeScreen(val act: MainActivity) : Screen {
             orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
             background = act.ripple(act.round(C.CARD, 18f)); setPadding(act.dp(10), act.dp(8), act.dp(16), act.dp(8))
         }
-        val tb = Sprites.thumb(act, r.ex.id)
-        val fig: View = if (tb != null) ThumbView(act, tb)
-            else FigureView(act).apply { ex = r.ex; still = r.ex.repPos(); mirror = r.mirror; radiusDp = 14f }
+        val fig = FigureView(act).apply {
+            thumb = true; active = false; mirror = r.mirror; radiusDp = 14f
+            if (Sprites.meta(r.ex.id) == null) { still = r.ex.repPos() }
+            ex = r.ex
+        }
+        thumbs.add(fig)
         row.addView(fig, lp(act.dp(92), act.dp(104)))
         val mid = LinearLayout(act).apply { orientation = LinearLayout.VERTICAL }
         mid.addView(act.tv(r.title, 15f, C.WHITE, HEAD).also { it.letterSpacing = 0.03f })
