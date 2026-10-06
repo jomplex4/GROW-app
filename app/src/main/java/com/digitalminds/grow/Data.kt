@@ -63,13 +63,33 @@ object Data {
         }
     }
 
+    /** rest after a step: -1 = the user's setting, 0..5 = fixed (side switch, continuous intervals), more = base seconds scaled by the setting */
+    fun restFor(base: Int, setting: Int): Int = when {
+        base == -1 -> setting
+        base <= 5 -> base
+        else -> Math.round(base * setting / 12f)
+    }
+
     fun totalSeconds(steps: List<Step>, restSec: Int): Int {
         var t = 0
         for ((i, s) in steps.withIndex()) {
             t += s.sec
-            if (i < steps.size - 1) t += if (s.rest == -1) restSec else s.rest
+            if (i < steps.size - 1) t += restFor(s.rest, restSec)
         }
         return t
+    }
+
+    /** main stimulus of a session: jumping, strength circuits and the running intervals */
+    fun isKey(s: Step): Boolean = s.tag == 'I' || s.tag == 'S' || (s.tag == 'R' && (s.ex.id == "jog" || s.ex.id == "run" || s.ex.id == "sprint"))
+
+    fun keyMinutes(steps: List<Step>): Triple<Int, Int, Int> {
+        var imp = 0; var str = 0; var run = 0
+        for (s in steps) when {
+            s.tag == 'I' -> imp += s.sec
+            s.tag == 'S' -> str += s.sec
+            s.tag == 'R' && isKey(s) -> run += s.sec
+        }
+        return Triple(Math.round(imp / 60f), Math.round(str / 60f), Math.round(run / 60f))
     }
 
     fun kcal(steps: List<Step>, weightKg: Float): Float {
@@ -79,7 +99,7 @@ object Data {
     }
 
     fun sectionLabel(tag: Char): String = when (tag) {
-        'W' -> "Warm-up"; 'I' -> "Impact"; 'R' -> "Run"; 'D' -> "Decompression"
+        'W' -> "Warm-up"; 'I' -> "Impact"; 'R' -> "Run"; 'S' -> "Strength"; 'D' -> "Decompression"
         'C' -> "Core & posture"; 'F' -> "Flexibility"; 'J' -> "Jaw & neck"; else -> ""
     }
 
@@ -140,7 +160,7 @@ object Data {
     fun authorFor(day: Int): String = quotes[monthIndex(day)].author
 
     fun sectionEs(tag: Char): String = when (tag) {
-        'W' -> "CALENTAMIENTO"; 'I' -> "IMPACTO"; 'R' -> "CARRERA"; 'D' -> "DESCOMPRESIÓN"
+        'W' -> "CALENTAMIENTO"; 'I' -> "IMPACTO"; 'R' -> "CARRERA"; 'S' -> "FUERZA"; 'D' -> "DESCOMPRESIÓN"
         'C' -> "CORE Y POSTURA"; 'F' -> "FLEXIBILIDAD"; 'J' -> "MANDÍBULA Y CUELLO"; else -> ""
     }
 
@@ -149,20 +169,20 @@ object Data {
         return when (dateOf(day).dayOfWeek.value) {
             1 -> "IMPACT + CORE"
             2 -> "RUN INTERVALS + MOBILITY"
-            3 -> "POSTURE + DECOMPRESSION"
+            3 -> "STRENGTH + POSTURE"
             4 -> "IMPACT + HANG"
-            5 -> "RUN + CORE + STRETCH"
+            5 -> "RUN + STRENGTH"
             7 -> "RECOVERY + MOBILITY"
             else -> "REST"
         }
     }
 
     private val coach = arrayOf(
-        "Base phase. Learn each movement with clean form. Quality beats speed, and the habit matters most right now.",
-        "Progression phase. Holds get longer and impact becomes regular. Keep your landings soft and your spine tall.",
-        "Build phase. Intervals get longer and the core work gets harder. Recovery weeks keep your joints happy.",
-        "Peak phase. This is your highest load. Sleep, protein and rest days decide how much you gain from it.",
-        "Consolidation phase. Hold your strength and posture while keeping the volume sustainable."
+        "Base phase. Jumps, runs and strength start at a moderate dose so your joints and habits adapt. Clean form first, then more.",
+        "Progression phase. Jump sets get longer, strength circuits add a third round and the runs add pace changes.",
+        "Build phase. Burpees and lunge jumps join the impact days, sprints appear in the runs and strength runs three rounds.",
+        "Peak phase. This is your highest dose. Sleep, protein and the rest day decide how much you gain from it.",
+        "Consolidation phase. Keep the strength and posture you built while the volume stays sustainable."
     )
     fun coachNote(day: Int): String = coach[phaseOf(day)]
 

@@ -65,6 +65,9 @@ class Store(ctx: Context) {
         all.sortWith(compareBy({ it.epochDay }, { it.slot }))
         p.edit().putString("logs", all.joinToString(";") { "${it.epochDay}|${it.slot}|${it.height}|${it.weight}" }).apply()
     }
+    /** erase completed days, streaks and measurements; settings (voice, rest, reminder) stay */
+    fun resetProgress() { p.edit().remove("doneG").remove("doneJ").remove("logs").apply() }
+
     fun lastHeight(): Float = logs().lastOrNull()?.height ?: 164f
     fun lastWeight(): Float = logs().lastOrNull()?.weight ?: 50f
 }

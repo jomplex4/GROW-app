@@ -264,6 +264,7 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
             if (!paused) {
                 if (st == St.WORK) {
                     if (sec in 1..3) act.speaker.say(sec.toString())
+                    if (totalMs >= 150_000 && (sec == 60 || sec == 30)) act.speaker.say(if (sec == 60) "One minute left" else "Thirty seconds")
                     if (!halfSaid && totalMs >= 40_000 && remMs <= totalMs / 2) { halfSaid = true; act.speaker.say("Halfway") }
                 } else if (st == St.READY && sec in 1..3) act.speaker.say(sec.toString())
                 else if (st == St.REST && sec in 1..3) act.speaker.say(sec.toString())
@@ -282,7 +283,7 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
 
     private fun finishWork() {
         if (idx >= steps.size - 1) { complete(); return }
-        val r = if (s().rest == -1) act.store.restSeconds else s().rest
+        val r = Data.restFor(s().rest, act.store.restSeconds)
         if (r <= 0) { idx++; startWork() } else startRest(r)
     }
 

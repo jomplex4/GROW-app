@@ -97,11 +97,13 @@ fun MainActivity.reminderCard(): View {
     val value = tv("", 22f, C.RED, HEAD).also { it.margins(t = dp(4)) }
     left.addView(value)
     row.addView(left, lp(0, WRAP, 1f))
+    c.tag = null
     val off = tv("OFF", 13f, C.GRAY, HEAD, Gravity.CENTER).apply {
         background = ripple(round(C.CARD2, 18f)); setPadding(dp(16), dp(9), dp(16), dp(9))
     }
     row.addView(off)
     c.addView(row)
+    c.addView(tv("If it does not ring, set GROW to Unrestricted in the phone's battery settings.", 11f, C.DIM, BODY).also { it.margins(t = dp(10)) })
     fun refresh() {
         val m = store.reminder
         value.text = if (m < 0) "Off" else "%02d:%02d".format(m / 60, m % 60)

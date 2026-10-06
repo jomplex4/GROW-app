@@ -41,9 +41,9 @@ for d in range(1, TOTAL + 1):
             check(len(s) == 5, f'{name} day {d} bad step {s}')
             xi, ss, rs, fl, tg = int(s[0]), int(s[1]), int(s[2]), int(s[3]), s[4]
             check(0 <= xi < 43, f'{name} day {d} bad exercise index {xi}')
-            check(15 <= ss <= 305, f'{name} day {d} bad seconds {ss}')
+            check(15 <= ss <= 720, f'{name} day {d} bad seconds {ss}')
             check(rs == -1 or 0 <= rs <= 60, f'{name} day {d} bad rest {rs}')
-            check(tg in 'WIRDCFJ', f'{name} day {d} bad tag {tg}')
+            check(tg in 'WIRSDCFJ', f'{name} day {d} bad tag {tg}')
             if fl == 1:
                 check(sided[xi] == 1, f'{name} day {d} flag on non sided {xi}')
                 check(k > 0 and int(steps[k - 1][0]) == xi and steps[k - 1][3] == '0', f'{name} day {d} left side without right side')
@@ -53,9 +53,24 @@ for d in range(1, TOTAL + 1):
         for rest in (8, 12, 20):
             tot = 0
             for k, s in enumerate(steps):
-                tot += int(s[1]); 
-                if k < len(steps) - 1: tot += rest if int(s[2]) == -1 else int(s[2])
+                tot += int(s[1])
+                if k < len(steps) - 1:
+                    b = int(s[2]); tot += rest if b == -1 else (b if b <= 5 else round(b * rest / 12.0))
             (mins if name == 'plan' else jmins).append(tot / 60)
+            if name == 'plan':
+                check(8 <= tot / 60 <= 40, f'plan day {d} length {tot/60:.1f} min at rest {rest}')
+        if name == 'plan':
+            tags = [x[4] for x in steps]
+            check(tags[0] in 'WR' or dt.weekday() == 6, f'plan day {d} does not start with warm-up')
+            if dt.weekday() in (0, 3):
+                imp = sum(int(x[1]) for x in steps if x[4] == 'I') / 60
+                check(imp >= 1.9, f'plan day {d} impact only {imp:.1f} min')
+            if dt.weekday() in (2, 4):
+                check(any(t == 'S' for t in tags), f'plan day {d} has no strength block')
+            names = [int(x[0]) for x in steps]
+            sd = [i for i, x in enumerate(steps) if int(x[3]) == 0 and sided[int(x[0])] == 0 and x[4] in 'WCDF']
+            ids_nonsided = [int(steps[i][0]) for i in sd]
+            check(len(ids_nonsided) == len(set(ids_nonsided)), f'plan day {d} repeats a warm-up/core/stretch exercise')
         if name == 'plan': n_train += 1
 check(n_train == 1108, f'training days {n_train}')
 print('training days', n_train, 'rest days', TOTAL - n_train)

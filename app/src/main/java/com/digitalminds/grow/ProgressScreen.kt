@@ -109,6 +109,11 @@ class ProgressScreen(val act: MainActivity) : Screen {
         about.addView(act.tv("About GROW", 16f, C.WHITE, MED))
         about.addView(act.tv("GROW builds the habits that support your best posture and frame: spinal decompression, impact for bone strength, core and posture work, and flexibility.\n\nExercise can recover the small height lost to daily spinal compression and improve posture, but it cannot override genetics or the point where growth plates close. A pediatrician or endocrinologist can check your bone age with a simple X-ray and tell you how much room is left to grow. Sleep 8 to 10 hours and eat enough protein, calcium and vitamin D.\n\nThe jaw and neck routine improves neck posture and jaw mobility. It cannot reshape facial bone, so stop if you feel pain or hear clicking.", 13f, C.GRAY, BODY).also { it.margins(t = act.dp(8)); it.setLineSpacing(act.dp(3).toFloat(), 1f) })
         col.addView(about, lp(MATCH, WRAP).also { it.topMargin = act.dp(14) })
+
+        val reset = act.tv("RESET PROGRESS", 13f, C.GRAY, HEAD, Gravity.CENTER).apply {
+            letterSpacing = 0.1f; background = act.ripple(act.round(C.CARD, 26f)); minHeight = act.dp(50); setOnClickListener { confirmReset() }
+        }
+        col.addView(reset, lp(MATCH, act.dp(50)).also { it.topMargin = act.dp(14) })
     }
 
     private fun chip(label: String, click: () -> Unit) = act.tv(label, 12f, C.WHITE, HEAD, Gravity.CENTER).apply {
@@ -129,6 +134,23 @@ class ProgressScreen(val act: MainActivity) : Screen {
             val d = v(lastL) - v(first)
             "Latest %.1f %s  ·  change since first entry %s%.1f %s".format(v(lastL), chart.unit, if (d >= 0) "+" else "", d, chart.unit)
         }
+    }
+
+    private fun confirmReset() {
+        val d = android.app.Dialog(act)
+        d.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+        val box = LinearLayout(act).apply {
+            orientation = LinearLayout.VERTICAL; background = act.round(C.CARD, 24f); setPadding(act.dp(24), act.dp(24), act.dp(24), act.dp(20))
+        }
+        box.addView(act.tv("Reset progress?", 20f, C.WHITE, HEAD))
+        box.addView(act.tv("This erases your completed days, streaks and measurements. Your settings stay. It cannot be undone.", 14f, C.GRAY, BODY).also { it.margins(t = act.dp(8)) })
+        val row = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL }
+        row.addView(act.button("CANCEL", C.RED, C.WHITE, 14f, 48, 24f).apply { setOnClickListener { d.dismiss() } }, lp(0, act.dp(48), 1f).also { it.rightMargin = act.dp(8) })
+        row.addView(act.button("RESET", C.CARD2, C.WHITE, 14f, 48, 24f).apply { setOnClickListener { act.store.resetProgress(); d.dismiss(); act.showHome() } }, lp(0, act.dp(48), 1f))
+        box.addView(row, lp(MATCH, WRAP).also { it.topMargin = act.dp(20) })
+        d.setContentView(box)
+        d.window?.apply { setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)); setLayout((act.resources.displayMetrics.widthPixels * 0.88f).toInt(), WRAP) }
+        d.show()
     }
 
     override fun onBack(): Boolean { act.showHome(); return true }

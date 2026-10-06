@@ -96,6 +96,18 @@ fun main() {
         check(Math.abs(Seq.profile(0.9999f, ri, ho, fa)) < 0.01f, "profile returns to start")
     }
 
+    // rest scaling, key work
+    check(Data.restFor(-1, 12) == 12 && Data.restFor(-1, 8) == 8, "restFor setting")
+    check(Data.restFor(0, 20) == 0 && Data.restFor(5, 20) == 5, "restFor fixed")
+    check(Data.restFor(15, 12) == 15 && Data.restFor(15, 8) == 10 && Data.restFor(15, 20) == 25, "restFor scaled")
+    fun ex(id: String) = Ex(id, id.uppercase(), "", emptyList(), "I", 5f, false, 1f, 0, false, false, 1f, -1f, -1f, 0f, 0f, false, false, arrayOf())
+    val demo = listOf(Step(ex("rope"), 40, 15, false, 'I'), Step(ex("jog"), 120, 0, false, 'R'), Step(ex("walk"), 60, 0, false, 'R'),
+                      Step(ex("plank"), 60, 15, false, 'S'), Step(ex("calf"), 30, -1, false, 'F'))
+    check(Data.keyMinutes(demo) == Triple(1, 1, 2), "keyMinutes ${Data.keyMinutes(demo)}")
+    check(Data.isKey(demo[0]) && Data.isKey(demo[1]) && !Data.isKey(demo[2]) && Data.isKey(demo[3]) && !Data.isKey(demo[4]), "isKey")
+    check(Data.totalSeconds(demo, 12) == 40 + 15 + 120 + 0 + 60 + 0 + 60 + 15 + 30, "totalSeconds ${Data.totalSeconds(demo, 12)}")
+    check(Data.sectionLabel('S') == "Strength" && Data.sectionEs('S') == "FUERZA", "strength labels")
+
     println("QA done, failures: $fails")
     if (fails > 0) System.exit(1)
 }

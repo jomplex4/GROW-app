@@ -8,7 +8,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import java.time.LocalDate
 
-class Row(val ex: Ex, val title: String, val seconds: Int, val tag: Char, val note: String, val mirror: Boolean = false)
+class Row(val ex: Ex, val title: String, val seconds: Int, val tag: Char, val note: String, val mirror: Boolean = false, val key: Boolean = false)
 
 class HomeScreen(val act: MainActivity) : Screen {
     override val view = FrameLayout(act)
@@ -31,13 +31,14 @@ class HomeScreen(val act: MainActivity) : Screen {
                 while (j < steps.size && steps[j].tag == 'R') { tot += steps[j].sec; j++ }
                 val jog = Data.exercises.first { it.id == "jog" }
                 val ex = if (steps.subList(i, j).any { it.ex.id == "jog" }) jog else s.ex
-                out.add(Row(ex, if (j - i == 1) s.title else "RUN INTERVALS", tot, 'R', if (j - i == 1) "" else "walk, jog and run"))
+                val keyRun = steps.subList(i, j).any { Data.isKey(it) }
+                out.add(Row(ex, if (j - i == 1) s.title else "RUN INTERVALS", tot, 'R', if (j - i == 1) "" else "walk, jog and run", false, keyRun))
                 i = j
             } else if (s.ex.sided && !s.mirror && i + 1 < steps.size && steps[i + 1].ex === s.ex) {
-                out.add(Row(s.ex, s.ex.name, s.sec, s.tag, "each side"))
+                out.add(Row(s.ex, s.ex.name, s.sec, s.tag, "each side", false, Data.isKey(s)))
                 i += 2
             } else {
-                out.add(Row(s.ex, s.title, s.sec, s.tag, "")); i++
+                out.add(Row(s.ex, s.title, s.sec, s.tag, "", false, Data.isKey(s))); i++
             }
         }
         return out
@@ -115,6 +116,12 @@ class HomeScreen(val act: MainActivity) : Screen {
             val kc = Math.round(Data.kcal(steps, act.store.lastWeight()))
             val st = act.card(18)
             st.addView(act.statTriple(rows.size.toString() to "Exercises", mins.toString() to "Minutes", kc.toString() to "kcal"))
+            val km = Data.keyMinutes(steps)
+            val parts = ArrayList<String>()
+            if (km.first > 0) parts.add("Impact ${km.first} min")
+            if (km.second > 0) parts.add("Strength ${km.second} min")
+            if (km.third > 0) parts.add("Run ${km.third} min")
+            if (parts.isNotEmpty()) st.addView(act.tv("KEY WORK  \u00B7  " + parts.joinToString("  \u00B7  "), 11f, C.RED, HEAD, Gravity.CENTER).also { it.letterSpacing = 0.08f; it.margins(t = act.dp(14)) }, lp(MATCH, WRAP))
             col.addView(st.also { it.margins(t = act.dp(12)) })
 
             if (!jaw) {
@@ -166,7 +173,12 @@ class HomeScreen(val act: MainActivity) : Screen {
         thumbs.add(fig)
         row.addView(fig, lp(act.dp(92), act.dp(104)))
         val mid = LinearLayout(act).apply { orientation = LinearLayout.VERTICAL }
-        mid.addView(act.tv(r.title, 15f, C.WHITE, HEAD).also { it.letterSpacing = 0.03f })
+        val titleRow = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        titleRow.addView(act.tv(r.title, 15f, C.WHITE, HEAD).also { it.letterSpacing = 0.03f })
+        if (r.key) titleRow.addView(act.tv("KEY", 9f, C.WHITE, HEAD, Gravity.CENTER).apply {
+            letterSpacing = 0.1f; background = act.round(C.RED, 6f); setPadding(act.dp(6), act.dp(2), act.dp(6), act.dp(2))
+        }, lp(WRAP, WRAP).also { it.leftMargin = act.dp(8) })
+        mid.addView(titleRow)
         if (r.note.isNotEmpty()) mid.addView(act.tv(r.note, 12f, C.DIM, BODY).also { it.margins(t = act.dp(3)) })
         row.addView(mid, lp(0, WRAP, 1f).also { it.leftMargin = act.dp(8) })
         row.addView(act.tv(fmtTime(r.seconds), 15f, C.RED, HEAD))

@@ -1,12 +1,12 @@
 # GROW
 
-App Android nativa en Kotlin (sin librerias externas, sin anuncios). Rutina diaria de postura, descompresion espinal, impacto y flexibilidad, mas un modulo aparte de mandibula y cuello. Version 1.6.
+App Android nativa en Kotlin (sin librerias externas, sin anuncios). Rutina diaria de postura, descompresion espinal, impacto y flexibilidad, mas un modulo aparte de mandibula y cuello. Version 2.0.
 
 ## Flujo de trabajo
 1. Descomprime este zip ENCIMA de tu carpeta local, reemplazando todo.
-2. Sube los cambios con Git (`git add .`, `git commit -m "GROW v1.6"`, `git push`).
-3. Para sacar la APK descargable: `git tag v1.6` y luego `git push origin v1.3`. GitHub Actions compila y publica `GROW-v1.6.apk` en Releases.
-4. En el celular: GitHub, repositorio, Releases, v1.6, Assets, descarga e instala.
+2. Sube los cambios con Git (`git add .`, `git commit -m "GROW v2.0"`, `git push`).
+3. Para sacar la APK descargable: `git tag v2.0` y luego `git push origin v2.0`. GitHub Actions compila y publica `GROW-v2.0.apk` en Releases.
+4. En el celular: GitHub, repositorio, Releases, v2.0, Assets, descarga e instala.
 
 La firma esta en `app/grow.jks`: no la cambies, asi cada APK se instala encima de la anterior sin perder datos.
 
