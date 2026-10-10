@@ -67,9 +67,19 @@ class HomeScreen(val act: MainActivity) : Screen {
         val head = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
         val logo = android.widget.ImageView(act).apply { setImageResource(R.drawable.dm_logo); adjustViewBounds = true; scaleType = android.widget.ImageView.ScaleType.FIT_START }
         head.addView(logo, lp(0, act.dp(26), 1f).also { it.rightMargin = act.dp(60) })
-        val chart = IconView(act, Ic.BARS, C.GRAY).apply { scale = 0.52f; background = act.round(C.CARD, 18f); setOnClickListener { act.showProgress() } }
-        val gear = IconView(act, Ic.SLIDERS, C.GRAY).apply { scale = 0.52f; background = act.round(C.CARD, 18f); setOnClickListener { act.showSettings() } }
-        head.addView(chart, lp(act.dp(34), act.dp(34)).also { it.rightMargin = act.dp(8) })
+        val gear = IconView(act, Ic.GEAR, C.GRAY).apply { scale = 0.52f; background = act.round(C.CARD, 18f); setOnClickListener { act.showSettings() } }
+        val infoIcon = IconView(act, Ic.INFO, C.GRAY).apply { scale = 0.52f; background = act.round(C.CARD, 18f); setOnClickListener { act.showInfo() } }
+        // Streak chip: 🔥 N DAYS  - taps to progress screen
+        val streak = act.store.streak(day, false)
+        val streakChip = act.tv("🔥 $streak", 15f, C.WHITE, HEAD, Gravity.CENTER).apply {
+            background = act.ripple(act.round(C.CARD, 18f))
+            setPadding(act.dp(12), 0, act.dp(12), 0)
+            minHeight = act.dp(34)
+            gravity = Gravity.CENTER
+            setOnClickListener { act.showProgress() }
+        }
+        head.addView(streakChip, lp(WRAP, act.dp(34)).also { it.rightMargin = act.dp(8) })
+        head.addView(infoIcon, lp(act.dp(34), act.dp(34)).also { it.rightMargin = act.dp(8) })
         head.addView(gear, lp(act.dp(34), act.dp(34)))
         col.addView(head)
 
@@ -181,7 +191,7 @@ class HomeScreen(val act: MainActivity) : Screen {
         mid.addView(titleRow)
         if (r.note.isNotEmpty()) mid.addView(act.tv(r.note, 12f, C.DIM, BODY).also { it.margins(t = act.dp(3)) })
         row.addView(mid, lp(0, WRAP, 1f).also { it.leftMargin = act.dp(8) })
-        row.addView(act.tv(fmtTime(r.seconds), 15f, C.RED, HEAD))
+        row.addView(LedClock(act, 15f, C.RED).also { it.text = fmtTime(r.seconds) })
         row.setOnClickListener { InfoSheet.show(act, r.ex, r.mirror) }
         row.layoutParams = lp(MATCH, WRAP).also { it.bottomMargin = act.dp(8) }
         return row

@@ -18,6 +18,10 @@ class Store(ctx: Context) {
         get() = p.getInt("rest", 1)
         set(v) { p.edit().putInt("rest", v).apply() }
 
+    var vibrationEnabled: Boolean
+        get() = p.getBoolean("vibr", true)
+        set(v) = p.edit().putBoolean("vibr", v).apply()
+
     val restSeconds: Int get() = intArrayOf(8, 12, 20)[restLevel.coerceIn(0, 2)]
 
     /** minutes of day, -1 = off */

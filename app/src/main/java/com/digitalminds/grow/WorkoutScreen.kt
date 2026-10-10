@@ -82,14 +82,16 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
     private val fig = FigureView(act)
     private val nameTv: TextView
     private val labelTv: TextView
-    private val timeTv: TextView
+    private val timeTv: LedClock
     private val pauseBtn: PillButton
-    private val restTime: TextView
+    private val restTime: LedClock
     private val restNext: TextView
-    private val restNextTime: TextView
+    private val restNextTime: LedClock
     private val restCount: TextView
     private val restFig = FigureView(act)
     private val restQuote: TextView
+    private lateinit var restQuoteEs: TextView
+    private lateinit var restAuthor: TextView
 
     init {
         view.setBackgroundColor(C.BG)
@@ -123,8 +125,8 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
         work.addView(labelTv, lp(MATCH, WRAP).also { it.topMargin = act.dp(6) })
 
         val panel = FrameLayout(act).apply { background = act.round(C.CARD, 24f) }
-        timeTv = act.tv("00:00", 60f, C.WHITE, HEAD, Gravity.CENTER)
-        panel.addView(timeTv, fl(MATCH, WRAP, Gravity.CENTER))
+        timeTv = LedClock(act, 46f, C.WHITE)
+        panel.addView(timeTv, fl(WRAP, WRAP, Gravity.CENTER).also { it.topMargin = act.dp(14); it.bottomMargin = act.dp(14) })
         work.addView(panel, lp(MATCH, act.dp(96)).also { it.setMargins(act.dp(16), act.dp(10), act.dp(16), 0) })
 
         pauseBtn = PillButton(act).apply { setOnClickListener { togglePause() } }
@@ -139,34 +141,59 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
             setOnClickListener { onClick() }
         }
         nav.addView(navBtn("Previous", Ic.PREV) { prev() }, lp(0, act.dp(44), 1f))
-        nav.addView(navBtn("Skip", Ic.NEXT) { skip() }, lp(0, act.dp(44), 1f))
+        nav.addView(navBtn("Skip", Ic.NEXT) { skipRest() }, lp(0, act.dp(44), 1f))
         work.addView(nav, lp(MATCH, act.dp(44)).also { it.topMargin = act.dp(4) })
 
         // ---------------- REST layout
         rest.orientation = LinearLayout.VERTICAL
-        rest.setBackgroundColor(C.REDD)
+        rest.setBackgroundColor(C.BG)
         rest.setPadding(0, act.dp(8), 0, act.dp(16))
         val rtop = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
         rtop.addView(IconView(act, Ic.BACK).apply { setOnClickListener { askQuit() } }, lp(act.dp(48), act.dp(48)))
         rest.addView(rtop, lp(MATCH, act.dp(48)))
-        restQuote = act.tv("", 15f, 0xFFFFFFFF.toInt(), Typeface.create(BODY, Typeface.ITALIC), Gravity.CENTER).apply { setLineSpacing(act.dp(3).toFloat(), 1f) }
-        rest.addView(restQuote, lp(MATCH, WRAP).also { it.setMargins(act.dp(28), act.dp(4), act.dp(28), 0) })
-        rest.addView(act.tv("REST", 18f, 0xFFFFFFFF.toInt(), HEAD, Gravity.CENTER).also { it.letterSpacing = 0.35f }, lp(MATCH, WRAP).also { it.topMargin = act.dp(22) })
-        restTime = act.tv("00:00", 96f, 0xFFFFFFFF.toInt(), HEAD, Gravity.CENTER)
-        rest.addView(restTime, lp(MATCH, WRAP).also { it.topMargin = act.dp(6) })
+        // Quote block: EN bigger, ES smaller, author right
+        val quoteBlock = LinearLayout(act).apply { orientation = LinearLayout.VERTICAL; setPadding(act.dp(28), act.dp(4), act.dp(28), 0) }
+        restQuote = act.tv("", 17f, C.WHITE, Typeface.create(BODY, Typeface.ITALIC), Gravity.CENTER).apply { setLineSpacing(act.dp(4).toFloat(), 1f) }
+        restQuoteEs = act.tv("", 13f, C.GRAY, Typeface.create(BODY, Typeface.ITALIC), Gravity.CENTER).apply { setLineSpacing(act.dp(3).toFloat(), 1f) }
+        restAuthor = act.tv("", 12f, C.GRAY, HEAD, Gravity.END).apply { letterSpacing = 0.08f }
+        quoteBlock.addView(restQuote, lp(MATCH, WRAP))
+        quoteBlock.addView(restQuoteEs, lp(MATCH, WRAP).also { it.topMargin = act.dp(6) })
+        quoteBlock.addView(restAuthor, lp(MATCH, WRAP).also { it.topMargin = act.dp(8) })
+        rest.addView(quoteBlock, lp(MATCH, WRAP))
+
+        // REST label + big scoreboard-style timer
+        rest.addView(act.tv("REST", 11f, C.GRAY, HEAD, Gravity.CENTER).also { it.letterSpacing = 0.35f }, lp(MATCH, WRAP).also { it.topMargin = act.dp(18) })
+        restTime = LedClock(act, 64f, C.WHITE)
+        rest.addView(restTime, lp(WRAP, WRAP).also { it.topMargin = act.dp(8); it.gravity = Gravity.CENTER_HORIZONTAL })
+
+        // Compact action row: [+20s] [SKIP] - rounded pill buttons side by side
         val rb = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER }
-        val plus = act.button("+20s", 0x40FFFFFF, C.WHITE, 16f, 48, 24f).apply { setOnClickListener { addTime(20000) } }
-        val skip = act.button("SKIP", C.WHITE, C.REDD, 16f, 48, 24f).apply { setOnClickListener { skip() } }
-        rb.addView(plus, lp(act.dp(120), act.dp(48)).also { it.rightMargin = act.dp(14) })
-        rb.addView(skip, lp(act.dp(120), act.dp(48)))
-        rest.addView(rb, lp(MATCH, WRAP).also { it.topMargin = act.dp(14) })
+        val plus = act.tv("+20", 13f, C.WHITE, HEAD, Gravity.CENTER).apply {
+            letterSpacing = 0.08f
+            background = act.ripple(act.round(0x28FFFFFF, 22f))
+            setPadding(act.dp(20), 0, act.dp(20), 0)
+            minHeight = act.dp(44)
+            gravity = Gravity.CENTER
+            setOnClickListener { addTime(20000) }
+        }
+        val skip = act.tv("SKIP  ›", 13f, C.WHITE, HEAD, Gravity.CENTER).apply {
+            letterSpacing = 0.1f
+            background = act.ripple(act.round(C.RED, 22f))
+            setPadding(act.dp(24), 0, act.dp(24), 0)
+            minHeight = act.dp(44)
+            gravity = Gravity.CENTER
+            setOnClickListener { skipRest() }
+        }
+        rb.addView(plus, lp(WRAP, act.dp(44)).also { it.rightMargin = act.dp(10) })
+        rb.addView(skip, lp(WRAP, act.dp(44)))
+        rest.addView(rb, lp(MATCH, WRAP).also { it.topMargin = act.dp(10) })
         val nx = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
         val nl = LinearLayout(act).apply { orientation = LinearLayout.VERTICAL }
         restCount = act.tv("", 12f, 0xCCFFFFFF.toInt(), HEAD).apply { letterSpacing = 0.16f }
         restNext = act.tv("", 20f, C.WHITE, HEAD).apply { letterSpacing = 0.03f }
         nl.addView(restCount); nl.addView(restNext.also { it.margins(t = act.dp(4)) })
         nx.addView(nl, lp(0, WRAP, 1f))
-        restNextTime = act.tv("", 18f, C.WHITE, HEAD)
+        restNextTime = LedClock(act, 20f, C.WHITE)
         nx.addView(restNextTime)
         rest.addView(nx, lp(MATCH, WRAP).also { it.setMargins(act.dp(24), act.dp(22), act.dp(24), 0) })
         val rstage = FrameLayout(act)
@@ -223,7 +250,10 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
         restNext.text = n.title
         restNextTime.text = fmtTime(n.sec)
         restCount.text = "NEXT  ${idx + 2}/${steps.size}"
-        restQuote.text = "\u201C" + Data.quoteFor(day) + "\u201D\n" + Data.authorFor(day).uppercase()
+        val q = Data.quotes[((day - 1) / 30).coerceIn(0, Data.quotes.size - 1)]
+        restQuote.text = "\u201C" + q.text + "\u201D"
+        restQuoteEs.text = q.es.ifBlank { "" }
+        restAuthor.text = "\u2014 " + q.author
         begin(sec * 1000L)
         buzz(30)
         act.speaker.say("Rest. Next, ${n.title.lowercase()}.")
@@ -295,7 +325,8 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
         act.showComplete(day, steps, (activeMs / 1000).toInt())
     }
 
-    private fun skip() {
+    private fun skipRest() {
+        buzz(60)
         when (st) {
             St.READY -> startWork()
             St.WORK -> finishWork()
@@ -304,6 +335,7 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
     }
 
     private fun prev() {
+        buzz(40)
         if (st == St.REST) { startWork(); return }
         if (idx > 0) { idx--; startWork() } else startWork()
     }
@@ -351,6 +383,7 @@ class WorkoutScreen(val act: MainActivity, val day: Int, val steps: List<Step>, 
     }
 
     private fun buzz(ms: Long) {
+        if (!act.store.vibrationEnabled) return
         try {
             val v = act.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
             v?.vibrate(VibrationEffect.createOneShot(ms, VibrationEffect.DEFAULT_AMPLITUDE))

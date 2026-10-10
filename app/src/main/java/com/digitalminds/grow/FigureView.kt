@@ -53,6 +53,8 @@ class CanvasGfx : Gfx {
     }
 }
 
+const val STAGE_FLAT = 0xFFD1D2D7.toInt()
+
 /** Shows the exercise as an animated sprite (ChatGPT art, aligned and morphed offline); falls back to the code-drawn figure. */
 class FigureView(ctx: Context) : View(ctx) {
     var ex: Ex? = null
@@ -113,6 +115,12 @@ class FigureView(ctx: Context) : View(ctx) {
     }
 
     private fun layout(m: SpriteMeta, w: Float, h: Float) {
+        if (m.opaque) {
+            val s = minOf(w / m.w, h / m.h)
+            val dw = m.w * s; val dh = m.h * s
+            dst.set((w - dw) / 2f, (h - dh) / 2f, (w + dw) / 2f, (h + dh) / 2f)
+            return
+        }
         if (m.bust) {
             val s = minOf(w * 0.98f / m.w, h / m.h)
             val dw = m.w * s; val dh = m.h * s
@@ -133,10 +141,44 @@ class FigureView(ctx: Context) : View(ctx) {
         } else c.drawBitmap(b, null, dst, bp)
     }
 
+    /** a single illustration brought to life: breathing, hop, alternating sides or a running bounce */
+    private fun drawIdle(c: Canvas, b: Bitmap, m: SpriteMeta, loopSec: Float, appear: Float) {
+        val twoPi = (2.0 * Math.PI).toFloat()
+        val dh = dst.height()
+        when (m.idle) {
+            "bounce" -> {
+                val hop = kotlin.math.abs(kotlin.math.sin(Math.PI.toFloat() * t / loopSec))
+                c.save(); c.translate(0f, -hop * 0.05f * dh); blit(c, b, false, appear); c.restore()
+            }
+            "alt" -> {
+                val beat = t / loopSec; val idx = beat.toInt(); val fr = beat - idx
+                val flipA = idx % 2 == 1
+                val fade = if (fr > 0.78f) Seq.smooth((fr - 0.78f) / 0.22f) else 0f
+                val bob = if (loopSec < 2f) -0.02f * dh * kotlin.math.abs(kotlin.math.sin(Math.PI.toFloat() * fr)) else 0f
+                c.save(); c.translate(0f, bob)
+                blit(c, b, flipA, (1f - fade) * appear)
+                if (fade > 0.01f) blit(c, b, !flipA, fade * appear)
+                c.restore()
+            }
+            "run" -> {
+                val ph = ((t / loopSec) % 1f + 1f) % 1f
+                val bob = -(0.5f - 0.5f * kotlin.math.cos(twoPi * ph)) * 0.035f * dh
+                val lean = 1.6f * kotlin.math.sin(twoPi * ph)
+                c.save(); c.translate(0f, bob); c.rotate(lean, dst.centerX(), dst.bottom - 0.05f * dh)
+                blit(c, b, false, appear); c.restore()
+            }
+            else -> {   // breath
+                val k = 1f + 0.012f * kotlin.math.sin(twoPi * t / 4.2f)
+                c.save(); c.scale(1f, k, dst.centerX(), dst.bottom - 0.06f * dh); blit(c, b, false, appear); c.restore()
+            }
+        }
+    }
+
     private fun drawSprite(c: Canvas, e: Ex, m: SpriteMeta) {
         val w = width.toFloat(); val h = height.toFloat()
         gfx.c = c
-        gfx.gradRoundRect(0f, 0f, w, h, radiusDp * resources.displayMetrics.density, Pal.stageTop, Pal.stageBot)
+        if (m.opaque) gfx.gradRoundRect(0f, 0f, w, h, radiusDp * resources.displayMetrics.density, STAGE_FLAT, STAGE_FLAT)
+        else gfx.gradRoundRect(0f, 0f, w, h, radiusDp * resources.displayMetrics.density, Pal.stageTop, Pal.stageBot)
         val fr: Array<Bitmap>? = if (thumb) (if (active) Sprites.halfFrames(e.id) else null) else Sprites.frames(e.id)
         layout(m, w, h)
         if (fr == null || fr.size < m.n) {
@@ -153,7 +195,9 @@ class FigureView(ctx: Context) : View(ctx) {
         if (mirror && e.sided) c.scale(-1f, 1f, w / 2f, h / 2f)
         if (m.ground && !m.bust) gfx.oval(dst.centerX(), dst.bottom, dst.width() * 0.30f, h * 0.018f, (0x26 * appear).toInt() shl 24)
         val loopSec = if (m.loop > 0f) m.loop else e.loop
-        if (!m.step) {
+        if (m.opaque && m.n == 1) {
+            drawIdle(c, fr[0], m, loopSec, appear)
+        } else if (!m.step) {
             val total = if (m.alt) loopSec * 2f else loopSec
             val ph = ((t / total) % 1f + 1f) % 1f
             val flip: Boolean; val local: Float
@@ -171,7 +215,10 @@ class FigureView(ctx: Context) : View(ctx) {
             val a: Int; val b: Int; val f: Float
             if (m.cycle) {
                 val fi = local * m.n
-                a = fi.toInt() % m.n; b = (a + 1) % m.n; f = fi - fi.toInt()
+                a = fi.toInt() % m.n; b = (a + 1) % m.n
+                val raw = fi - fi.toInt()
+                // few key poses (burpee): hold each pose, then a quick change; many frames: continuous motion
+                f = if (m.n <= 6) Seq.smooth(((raw - 0.72f) / 0.28f).coerceIn(0f, 1f)) else raw
             } else {
                 val pos = if (m.cyc) Seq.cosPos(local) else Seq.profile(local, m.ri, m.ho, m.fa)
                 val fi = pos * (m.n - 1)

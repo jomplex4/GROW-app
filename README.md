@@ -1,12 +1,12 @@
-# GROW
+# GROWTH
 
-App Android nativa en Kotlin (sin librerias externas, sin anuncios). Rutina diaria de postura, descompresion espinal, impacto y flexibilidad, mas un modulo aparte de mandibula y cuello. Version 2.0.
+App Android nativa en Kotlin (sin librerias externas, sin anuncios). Rutina diaria de postura, descompresion espinal, impacto y flexibilidad, mas un modulo aparte de mandibula y cuello. Version 2.4.
 
 ## Flujo de trabajo
 1. Descomprime este zip ENCIMA de tu carpeta local, reemplazando todo.
-2. Sube los cambios con Git (`git add .`, `git commit -m "GROW v2.0"`, `git push`).
-3. Para sacar la APK descargable: `git tag v2.0` y luego `git push origin v2.0`. GitHub Actions compila y publica `GROW-v2.0.apk` en Releases.
-4. En el celular: GitHub, repositorio, Releases, v2.0, Assets, descarga e instala.
+2. Sube los cambios con Git (`git add .`, `git commit -m "GROWTH v2.4"`, `git push`).
+3. Para sacar la APK descargable: `git tag v2.4` y luego `git push origin v2.4`. GitHub Actions compila y publica `GROWTH-v2.4.apk` en Releases.
+4. En el celular: GitHub, repositorio, Releases, v2.4, Assets, descarga e instala.
 
 La firma esta en `app/grow.jks`: no la cambies, asi cada APK se instala encima de la anterior sin perder datos.
 
@@ -23,3 +23,10 @@ La firma esta en `app/grow.jks`: no la cambies, asi cada APK se instala encima d
 - Fechas: `Data.kt` (`START`, `END`) y `author/export.py`.
 - Colores: `Theme.kt` (objeto `C`) y `Pal` en `FigureRenderer.kt` (fondo del escenario).
 - Ícono: `res/drawable-nodpi/ic_launcher_fg.png` sobre fondo `#BEBEBE`. Logo de la pantalla de inicio: `res/drawable-nodpi/grow_logo.png`.
+
+## Ilustraciones de los ejercicios (v2.4)
+Las imagenes de los 36 ejercicios principales vienen de **RepDB** (https://repdb.co, plan gratuito: uso personal o comercial dentro de apps, con enlace de atribucion visible; ya esta en la pantalla de informacion de la app). Se recolorean a la paleta de la app (polo rojo, short negro, fondo plomo) y se animan entre la pose inicial y la final. Los 7 ejercicios de mandibula y cuello conservan sus imagenes propias.
+- `pipeline/repdb_map.py`: que ejercicio de RepDB corresponde a cada ejercicio de la app.
+- `pipeline/repdb_fetch.py`: descarga las ilustraciones originales a `pipeline/repdb/` (no se suben al repositorio por la licencia).
+- `pipeline/repdb_build.py`: recolorea, interpola y escribe los cuadros en `assets/anim/` y `meta.json`.
+- `author/patch_text.py`: textos en espanol de los ejercicios cuya imagen cambio. `author/export.py` los aplica; `author/plan_gen.py` genera `plan.txt`.

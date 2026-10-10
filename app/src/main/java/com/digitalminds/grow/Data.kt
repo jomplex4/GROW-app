@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 object Data {
-    val START: LocalDate = LocalDate.of(2026, 10, 5)
+    val START: LocalDate = LocalDate.of(2026, 10, 11)
     val END: LocalDate = LocalDate.of(2030, 4, 18)
     val TOTAL: Int = (ChronoUnit.DAYS.between(START, END) + 1).toInt()
 
@@ -103,53 +103,53 @@ object Data {
         'C' -> "Core & posture"; 'F' -> "Flexibility"; 'J' -> "Jaw & neck"; else -> ""
     }
 
-    class Quote(val text: String, val author: String)
+    class Quote(val text: String, val author: String, val es: String = "")
 
     /** One quote per month, starting October 2026. Themes: universe, life, philosophy, growth mindset, business, investing, study, discipline. */
     val quotes = arrayOf(
-        Quote("We are a way for the cosmos to know itself.", "Carl Sagan"),
-        Quote("The unexamined life is not worth living.", "Socrates"),
-        Quote("Becoming is better than being.", "Carol Dweck"),
-        Quote("Spend each day trying to be a little wiser than you were when you woke up.", "Charlie Munger"),
-        Quote("The journey of a thousand miles begins with a single step.", "Lao Tzu"),
-        Quote("Discipline is the bridge between goals and accomplishment.", "Jim Rohn"),
-        Quote("Imagination is more important than knowledge.", "Albert Einstein"),
-        Quote("The impediment to action advances action. What stands in the way becomes the way.", "Marcus Aurelius"),
-        Quote("Risk comes from not knowing what you're doing.", "Warren Buffett"),
-        Quote("You do not rise to the level of your goals. You fall to the level of your systems.", "James Clear"),
-        Quote("Look up at the stars and not down at your feet.", "Stephen Hawking"),
-        Quote("He who has a why to live can bear almost any how.", "Friedrich Nietzsche"),
-        Quote("Stay hungry. Stay foolish.", "Steve Jobs"),
-        Quote("The first principle is that you must not fool yourself, and you are the easiest person to fool.", "Richard Feynman"),
-        Quote("We suffer more often in imagination than in reality.", "Seneca"),
-        Quote("Someone is sitting in the shade today because someone planted a tree a long time ago.", "Warren Buffett"),
-        Quote("Knowing is not enough; we must apply. Willing is not enough; we must do.", "Johann Wolfgang von Goethe"),
-        Quote("Life is like riding a bicycle. To keep your balance, you must keep moving.", "Albert Einstein"),
-        Quote("Men are disturbed not by things, but by the views they take of them.", "Epictetus"),
-        Quote("The big money is not in the buying and selling, but in the waiting.", "Charlie Munger"),
-        Quote("I've failed over and over and over again in my life. And that is why I succeed.", "Michael Jordan"),
-        Quote("Nothing great was ever achieved without enthusiasm.", "Ralph Waldo Emerson"),
-        Quote("It is not that we have a short time to live, but that we waste a lot of it.", "Seneca"),
-        Quote("Do not let what you cannot do interfere with what you can do.", "John Wooden"),
-        Quote("The investor's chief problem, and even his worst enemy, is likely to be himself.", "Benjamin Graham"),
-        Quote("Grit is passion and perseverance for very long-term goals.", "Angela Duckworth"),
-        Quote("Your time is limited, so don't waste it living someone else's life.", "Steve Jobs"),
-        Quote("Earn with your mind, not your time.", "Naval Ravikant"),
-        Quote("Waste no more time arguing what a good man should be. Be one.", "Marcus Aurelius"),
-        Quote("I learned that courage was not the absence of fear, but the triumph over it.", "Nelson Mandela"),
-        Quote("An investment in knowledge pays the best interest.", "Benjamin Franklin"),
-        Quote("Be quick, but don't hurry.", "John Wooden"),
-        Quote("First say to yourself what you would be; and then do what you have to do.", "Epictetus"),
-        Quote("Do what you can, with what you have, where you are.", "Theodore Roosevelt"),
-        Quote("If you have a garden and a library, you have everything you need.", "Cicero"),
-        Quote("Somewhere, something incredible is waiting to be known.", "Carl Sagan"),
-        Quote("The roots of education are bitter, but the fruit is sweet.", "Aristotle"),
-        Quote("The beginning is the most important part of the work.", "Plato"),
-        Quote("Nothing in life is to be feared, it is only to be understood.", "Marie Curie"),
-        Quote("Success is a lousy teacher.", "Bill Gates"),
-        Quote("The best investment you can make is in yourself.", "Warren Buffett"),
-        Quote("The last of the human freedoms: to choose one's attitude in any given set of circumstances.", "Viktor Frankl"),
-        Quote("The only way to do great work is to love what you do.", "Steve Jobs")
+        Quote("We are a way for the cosmos to know itself.", "Carl Sagan", "Somos la manera en que el cosmos se conoce a sí mismo."),
+        Quote("The unexamined life is not worth living.", "Socrates", "Una vida sin examen no merece ser vivida."),
+        Quote("Becoming is better than being.", "Carol Dweck", "Llegar a ser es mejor que simplemente ser."),
+        Quote("Spend each day trying to be a little wiser than you were when you woke up.", "Charlie Munger", "Pasa cada día tratando de ser un poco más sabio que cuando te despertaste."),
+        Quote("The journey of a thousand miles begins with a single step.", "Lao Tzu", "Un viaje de mil millas comienza con un solo paso."),
+        Quote("Discipline is the bridge between goals and accomplishment.", "Jim Rohn", "La disciplina es el puente entre las metas y los logros."),
+        Quote("Imagination is more important than knowledge.", "Albert Einstein", "La imaginación es más importante que el conocimiento."),
+        Quote("The impediment to action advances action. What stands in the way becomes the way.", "Marcus Aurelius", "El obstáculo de la acción hace avanzar la acción. Lo que se interpone en el camino se convierte en el camino."),
+        Quote("Risk comes from not knowing what you're doing.", "Warren Buffett", "El riesgo viene de no saber lo que estás haciendo."),
+        Quote("You do not rise to the level of your goals. You fall to the level of your systems.", "James Clear", "No alcanzas el nivel de tus metas. Caes al nivel de tus sistemas."),
+        Quote("Look up at the stars and not down at your feet.", "Stephen Hawking", "Mira las estrellas, no el suelo bajo tus pies."),
+        Quote("He who has a why to live can bear almost any how.", "Friedrich Nietzsche", "Quien tiene un por qué para vivir puede soportar casi cualquier cómo."),
+        Quote("Stay hungry. Stay foolish.", "Steve Jobs", "Permanece hambriento. Permanece ingenuo."),
+        Quote("The first principle is that you must not fool yourself, and you are the easiest person to fool.", "Richard Feynman", "El primer principio es que no debes engañarte a ti mismo, y eres la persona más fácil de engañar."),
+        Quote("We suffer more often in imagination than in reality.", "Seneca", "Sufrimos más frecuentemente en la imaginación que en la realidad."),
+        Quote("Someone is sitting in the shade today because someone planted a tree a long time ago.", "Warren Buffett", "Alguien descansa hoy a la sombra porque alguien plantó un árbol hace mucho tiempo."),
+        Quote("Knowing is not enough; we must apply. Willing is not enough; we must do.", "Johann Wolfgang von Goethe", "Saber no es suficiente; debemos aplicar. Querer no es suficiente; debemos hacer."),
+        Quote("Life is like riding a bicycle. To keep your balance, you must keep moving.", "Albert Einstein", "La vida es como montar en bicicleta. Para mantener el equilibrio, debes seguir moviéndote."),
+        Quote("Men are disturbed not by things, but by the views they take of them.", "Epictetus", "Los hombres no se perturban por las cosas, sino por la opinión que tienen de ellas."),
+        Quote("The big money is not in the buying and selling, but in the waiting.", "Charlie Munger", "El gran dinero no está en comprar y vender, sino en esperar."),
+        Quote("I've failed over and over and over again in my life. And that is why I succeed.", "Michael Jordan", "He fracasado una y otra vez en mi vida. Y por eso tengo éxito."),
+        Quote("Nothing great was ever achieved without enthusiasm.", "Ralph Waldo Emerson", "Nada grandioso se logró jamás sin entusiasmo."),
+        Quote("It is not that we have a short time to live, but that we waste a lot of it.", "Seneca", "No es que tengamos poco tiempo para vivir, sino que desperdiciamos mucho."),
+        Quote("Do not let what you cannot do interfere with what you can do.", "John Wooden", "No dejes que lo que no puedes hacer interfiera con lo que puedes hacer."),
+        Quote("The investor's chief problem, and even his worst enemy, is likely to be himself.", "Benjamin Graham", "El principal problema del inversor, incluso su peor enemigo, suele ser él mismo."),
+        Quote("Grit is passion and perseverance for very long-term goals.", "Angela Duckworth", "La perseverancia es pasión y constancia hacia metas de muy largo plazo."),
+        Quote("Your time is limited, so don't waste it living someone else's life.", "Steve Jobs", "Tu tiempo es limitado, así que no lo desperdicies viviendo la vida de otro."),
+        Quote("Earn with your mind, not your time.", "Naval Ravikant", "Gana con tu mente, no con tu tiempo."),
+        Quote("Waste no more time arguing what a good man should be. Be one.", "Marcus Aurelius", "No pierdas más tiempo argumentando cómo debe ser un buen hombre. Sé uno."),
+        Quote("I learned that courage was not the absence of fear, but the triumph over it.", "Nelson Mandela", "Aprendí que el coraje no es la ausencia del miedo, sino el triunfo sobre él."),
+        Quote("An investment in knowledge pays the best interest.", "Benjamin Franklin", "Una inversión en conocimiento paga el mejor interés."),
+        Quote("Be quick, but don't hurry.", "John Wooden", "Sé rápido, pero no te apresures."),
+        Quote("First say to yourself what you would be; and then do what you have to do.", "Epictetus", "Primero dite a ti mismo lo que quieres ser; y luego haz lo que tienes que hacer."),
+        Quote("Do what you can, with what you have, where you are.", "Theodore Roosevelt", "Haz lo que puedas, con lo que tengas, donde estés."),
+        Quote("If you have a garden and a library, you have everything you need.", "Cicero", "Si tienes un jardín y una biblioteca, tienes todo lo que necesitas."),
+        Quote("Somewhere, something incredible is waiting to be known.", "Carl Sagan", "En algún lugar, algo increíble está esperando ser descubierto."),
+        Quote("The roots of education are bitter, but the fruit is sweet.", "Aristotle", "Las raíces de la educación son amargas, pero su fruto es dulce."),
+        Quote("The beginning is the most important part of the work.", "Plato", "El comienzo es la parte más importante del trabajo."),
+        Quote("Nothing in life is to be feared, it is only to be understood.", "Marie Curie", "Nada en la vida es para ser temido, solo para ser comprendido."),
+        Quote("Success is a lousy teacher.", "Bill Gates", "El éxito es un pésimo maestro."),
+        Quote("The best investment you can make is in yourself.", "Warren Buffett", "La mejor inversión que puedes hacer es en ti mismo."),
+        Quote("The last of the human freedoms: to choose one's attitude in any given set of circumstances.", "Viktor Frankl", "La última de las libertades humanas: elegir la propia actitud ante cualquier conjunto de circunstancias."),
+        Quote("The only way to do great work is to love what you do.", "Steve Jobs", "La única manera de hacer un gran trabajo es amar lo que haces.")
     )
 
     private fun monthIndex(day: Int): Int {

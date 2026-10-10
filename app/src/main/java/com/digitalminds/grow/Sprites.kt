@@ -20,7 +20,9 @@ class SpriteMeta(
     val cycle: Boolean = false,      // frames form a forward loop (gait) instead of start -> end -> start
     val ri: Float = 0.5f, val ho: Float = 0f, val fa: Float = 0.5f,   // rise / hold / fall fractions of the loop
     val dip: Boolean = false,        // quick fade when switching to the mirrored side
-    val breath: Boolean = false      // subtle breathing on static holds
+    val breath: Boolean = false,     // subtle breathing on static holds
+    val opaque: Boolean = false,     // full-frame illustration on the flat stage colour
+    val idle: String = "breath"      // single-pose animation: breath | bounce | alt | run
 )
 
 /** Pure sequencing helpers (no Android types) so they can be unit tested on the JVM. */
@@ -85,7 +87,7 @@ object Sprites {
                     m.optInt("step") == 1, m.optInt("cyc") == 1, m.optInt("bust") == 1, m.optInt("ground", 1) == 1,
                     m.optDouble("loop", 0.0).toFloat(), m.optString("mode", "pp") == "cy",
                     m.optDouble("ri", 0.5).toFloat(), m.optDouble("ho", 0.0).toFloat(), m.optDouble("fa", 0.5).toFloat(),
-                    m.optInt("alt") == 2, m.optInt("br") == 1)
+                    m.optInt("alt") == 2, m.optInt("br") == 1, m.optInt("opaque") == 1, m.optString("idle", "breath"))
             }
         } catch (e: Exception) { /* no sprites: the app falls back to the code-drawn figure */ }
     }

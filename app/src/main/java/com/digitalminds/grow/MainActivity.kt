@@ -46,6 +46,8 @@ class MainActivity : Activity() {
 
     fun showHome() { keepAwake(false); swap(HomeScreen(this)) }
     fun showSettings() { swap(SettingsScreen(this)) }
+    fun showInfo() { swap(InfoScreen(this)) }
+
     fun showProgress() { swap(ProgressScreen(this)) }
     fun startWorkout(day: Int, steps: List<Step>) { keepAwake(true); swap(WorkoutScreen(this, day, steps, jawMode)) }
     fun showComplete(day: Int, steps: List<Step>, elapsedSec: Int) { keepAwake(false); swap(CompleteScreen(this, day, steps, elapsedSec, jawMode)) }

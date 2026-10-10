@@ -8,9 +8,9 @@ fun check(c: Boolean, msg: String) { if (!c) { fails++; if (fails <= 40) println
 
 fun main() {
     // ---------------- calendar
-    check(Data.TOTAL == 1292, "TOTAL ${Data.TOTAL}")
-    check(Data.dateOf(1) == LocalDate.of(2026, 10, 5), "day 1 date")
-    check(Data.dateOf(1).dayOfWeek == DayOfWeek.MONDAY, "day 1 is Monday")
+    check(Data.TOTAL == 1286, "TOTAL ${Data.TOTAL}")
+    check(Data.dateOf(1) == LocalDate.of(2026, 10, 11), "day 1 date")
+    check(Data.dateOf(1).dayOfWeek == DayOfWeek.SUNDAY, "day 1 is Sunday")
     check(Data.dateOf(Data.TOTAL) == LocalDate.of(2030, 4, 18), "last day date ${Data.dateOf(Data.TOTAL)}")
     var rest = 0; var leapSeen = false
     for (d in 1..Data.TOTAL) {
@@ -27,14 +27,14 @@ fun main() {
         check(qi in 0 until Data.quotes.size, "quote index $d = $qi")
         check(Data.quoteFor(d) == Data.quotes[qi].text && Data.authorFor(d).isNotEmpty(), "quote $d")
     }
-    check(rest == 184, "rest days $rest")
+    check(rest == (1..Data.TOTAL).count { Data.dateOf(it).dayOfWeek == DayOfWeek.SATURDAY }, "rest days $rest")
     check(leapSeen, "29 Feb 2028 missing")
     check(Data.quotes.size == 43, "quotes ${Data.quotes.size}")
     check(Data.phaseOf(1) == 0 && Data.phaseOf(90) == 0 && Data.phaseOf(91) == 1 && Data.phaseOf(365) == 1 && Data.phaseOf(366) == 2 &&
           Data.phaseOf(730) == 2 && Data.phaseOf(731) == 3 && Data.phaseOf(1100) == 3 && Data.phaseOf(1101) == 4 && Data.phaseOf(Data.TOTAL) == 4, "phase boundaries")
     // before / after the programme, and extreme device dates
-    check(Data.dayOf(LocalDate.of(2026, 10, 4)) == 0, "day before start")
-    check(Data.dayOf(LocalDate.of(2030, 4, 19)) == 1293, "day after end")
+    check(Data.dayOf(LocalDate.of(2026, 10, 10)) == 0, "day before start")
+    check(Data.dayOf(LocalDate.of(2030, 4, 19)) == Data.TOTAL + 1, "day after end")
     for (dt in listOf(LocalDate.of(2000, 1, 1), LocalDate.of(2026, 1, 1), LocalDate.of(2099, 12, 31), LocalDate.of(2030, 4, 19))) {
         val d = Data.dayOf(dt)
         check(d < 1 || d > Data.TOTAL, "outside range $dt")
@@ -57,7 +57,7 @@ fun main() {
     }
     val all = (1..Data.TOTAL).filter { !Data.isRest(it) }.toSet()
     check(Logic.streak(all, 100) { Data.isRest(it) } == (1..100).count { !Data.isRest(it) }, "perfect streak")
-    check(Logic.bestStreak(all, Data.TOTAL) { Data.isRest(it) } == 1108, "perfect best")
+    check(Logic.bestStreak(all, Data.TOTAL) { Data.isRest(it) } == all.size, "perfect best")
     check(Logic.streak(emptySet(), 50) { Data.isRest(it) } == 0, "empty streak")
     check(Logic.streak(setOf(10), 1) { Data.isRest(it) } == 0, "future day done")
 

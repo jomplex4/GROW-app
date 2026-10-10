@@ -10,7 +10,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-enum class Ic { BACK, GEAR, CHART, PAUSE, PLAY, PREV, NEXT, CHECK, CLOSE, SLIDERS, BARS }
+enum class Ic { BACK, GEAR, CHART, PAUSE, PLAY, PREV, NEXT, CHECK, CLOSE, SLIDERS, BARS, INFO }
 
 class IconView(ctx: Context, var kind: Ic, var color: Int = C.WHITE) : View(ctx) {
     var scale = 1f
@@ -47,6 +47,13 @@ class IconView(ctx: Context, var kind: Ic, var color: Int = C.WHITE) : View(ctx)
                 path.reset(); path.moveTo(cx + s * .2f, cy - s * .22f); path.lineTo(cx - s * .12f, cy); path.lineTo(cx + s * .2f, cy + s * .22f); path.close(); c.drawPath(path, f) }
             Ic.NEXT -> { c.drawLine(cx + s * .22f, cy - s * .2f, cx + s * .22f, cy + s * .2f, p)
                 path.reset(); path.moveTo(cx - s * .2f, cy - s * .22f); path.lineTo(cx + s * .12f, cy); path.lineTo(cx - s * .2f, cy + s * .22f); path.close(); c.drawPath(path, f) }
+            Ic.INFO -> {
+                val r = s * 0.40f
+                val sp = Paint(f); sp.style = Paint.Style.STROKE; sp.strokeWidth = s * 0.07f
+                c.drawCircle(cx, cy, r, sp)
+                c.drawCircle(cx, cy - r * 0.46f, s * 0.045f, f)
+                c.drawRoundRect(android.graphics.RectF(cx - s * 0.035f, cy - r * 0.18f, cx + s * 0.035f, cy + r * 0.56f), s * 0.03f, s * 0.03f, f)
+            }
             Ic.SLIDERS -> {
                 p.strokeWidth = s * .075f
                 val ys = floatArrayOf(-.30f, 0f, .30f); val ks = floatArrayOf(-.14f, .20f, -.02f)

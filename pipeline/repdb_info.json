@@ -1,0 +1,339 @@
+{
+ "march": {
+  "rep": "Bodyweight Squat",
+  "repid": "bodyweight-squat",
+  "files": {
+   "start": "images/flat/bodyweight-squat-start.webp",
+   "peak": "images/flat/bodyweight-squat-peak.webp"
+  },
+  "unilateral": false,
+  "met": 6.0
+ },
+ "armcirc": {
+  "rep": "Cross-Body Shoulder Stretch",
+  "repid": "cross-body-shoulder-stretch",
+  "files": {
+   "main": "images/flat/cross-body-shoulder-stretch-main.webp"
+  },
+  "unilateral": true,
+  "met": 5.0
+ },
+ "jj": {
+  "rep": "Jumping Jacks",
+  "repid": "jumping-jacks",
+  "files": {
+   "start": "images/flat/jumping-jacks-start.webp",
+   "peak": "images/flat/jumping-jacks-peak.webp"
+  },
+  "unilateral": false,
+  "met": 8.0
+ },
+ "legswing": {
+  "rep": "Front-to-Back Leg Swing",
+  "repid": "leg-swing-front-to-back",
+  "files": {
+   "start": "images/flat/leg-swing-front-to-back-start.webp",
+   "peak": "images/flat/leg-swing-front-to-back-peak.webp"
+  },
+  "unilateral": true,
+  "met": 3.5
+ },
+ "highknee": {
+  "rep": "High Knees",
+  "repid": "high-knees",
+  "files": {
+   "main": "images/flat/high-knees-main.webp"
+  },
+  "unilateral": false,
+  "met": 8.0
+ },
+ "buttkick": {
+  "rep": "Bodyweight Reverse Lunge",
+  "repid": "bodyweight-reverse-lunge",
+  "files": {
+   "start": "images/flat/bodyweight-reverse-lunge-start.webp",
+   "peak": "images/flat/bodyweight-reverse-lunge-peak.webp"
+  },
+  "unilateral": true,
+  "met": 5.0
+ },
+ "rope": {
+  "rep": "Jump Rope",
+  "repid": "jump-rope",
+  "files": {
+   "main": "images/flat/jump-rope-main.webp"
+  },
+  "unilateral": false,
+  "met": 11.8
+ },
+ "squatjump": {
+  "rep": "Jump Squat",
+  "repid": "jump-squat",
+  "files": {
+   "start": "images/flat/jump-squat-start.webp",
+   "peak": "images/flat/jump-squat-peak.webp"
+  },
+  "unilateral": false,
+  "met": 7.0
+ },
+ "lungejump": {
+  "rep": "Plyo Lunge",
+  "repid": "plyo-lunge",
+  "files": {
+   "start": "images/flat/plyo-lunge-start.webp",
+   "peak": "images/flat/plyo-lunge-peak.webp"
+  },
+  "unilateral": true,
+  "met": 7.0
+ },
+ "walk": {
+  "rep": "Walking",
+  "repid": "walking",
+  "files": {
+   "main": "images/flat/walking-main.webp"
+  },
+  "unilateral": false,
+  "met": 3.5
+ },
+ "jog": {
+  "rep": "Running",
+  "repid": "running",
+  "files": {
+   "main": "images/flat/running-main.webp"
+  },
+  "unilateral": false,
+  "met": 8.0
+ },
+ "run": {
+  "rep": "Running",
+  "repid": "running",
+  "files": {
+   "main": "images/flat/running-main.webp"
+  },
+  "unilateral": false,
+  "met": 8.0
+ },
+ "sprint": {
+  "rep": "Running",
+  "repid": "running",
+  "files": {
+   "main": "images/flat/running-main.webp"
+  },
+  "unilateral": false,
+  "met": 8.0
+ },
+ "hang": {
+  "rep": "Dead Hang",
+  "repid": "dead-hang",
+  "files": {
+   "main": "images/flat/dead-hang-main.webp"
+  },
+  "unilateral": false,
+  "met": 4.5
+ },
+ "kneeraise": {
+  "rep": "Hanging Knee Raise",
+  "repid": "hanging-knee-raise",
+  "files": {
+   "start": "images/flat/hanging-knee-raise-start.webp",
+   "peak": "images/flat/hanging-knee-raise-peak.webp"
+  },
+  "unilateral": false,
+  "met": 6.0
+ },
+ "cobra": {
+  "rep": "Cobra Stretch",
+  "repid": "cobra-stretch",
+  "files": {
+   "main": "images/flat/cobra-stretch-main.webp"
+  },
+  "unilateral": false,
+  "met": 5.0
+ },
+ "child": {
+  "rep": "Child's Pose",
+  "repid": "childs-pose",
+  "files": {
+   "main": "images/flat/childs-pose-main.webp"
+  },
+  "unilateral": false,
+  "met": 5.0
+ },
+ "catcow": {
+  "rep": "Cat-Cow",
+  "repid": "cat-cow",
+  "files": {
+   "main": "images/flat/cat-cow-main.webp"
+  },
+  "unilateral": false,
+  "met": 5.0
+ },
+ "knees2chest": {
+  "rep": "Knee-to-Chest Stretch",
+  "repid": "knee-to-chest-stretch",
+  "files": {
+   "main": "images/flat/knee-to-chest-stretch-main.webp"
+  },
+  "unilateral": true,
+  "met": 5.0
+ },
+ "elongate": {
+  "rep": "Supine Spinal Twist",
+  "repid": "supine-spinal-twist",
+  "files": {
+   "main": "images/flat/supine-spinal-twist-main.webp"
+  },
+  "unilateral": true,
+  "met": 5.0
+ },
+ "plank": {
+  "rep": "Plank",
+  "repid": "plank",
+  "files": {
+   "main": "images/flat/plank-main.webp"
+  },
+  "unilateral": false,
+  "met": 3.5
+ },
+ "mclimb": {
+  "rep": "Mountain Climbers",
+  "repid": "mountain-climbers",
+  "files": {
+   "start": "images/flat/mountain-climbers-start.webp",
+   "peak": "images/flat/mountain-climbers-peak.webp"
+  },
+  "unilateral": false,
+  "met": 8.0
+ },
+ "burpee": {
+  "rep": "Burpees",
+  "repid": "burpees",
+  "files": {
+   "main": "images/flat/burpees-main.webp"
+  },
+  "unilateral": false,
+  "met": 8.0
+ },
+ "wallangel": {
+  "rep": "Wall Push Ups",
+  "repid": "wall-push-ups",
+  "files": {
+   "start": "images/flat/wall-push-ups-start.webp",
+   "peak": "images/flat/wall-push-ups-peak.webp"
+  },
+  "unilateral": false,
+  "met": 5.0
+ },
+ "wallstand": {
+  "rep": "Mountain Pose",
+  "repid": "mountain-pose",
+  "files": {
+   "main": "images/flat/mountain-pose-main.webp"
+  },
+  "unilateral": false,
+  "met": 2.0
+ },
+ "reach": {
+  "rep": "Standing Forward Fold",
+  "repid": "standing-forward-fold",
+  "files": {
+   "main": "images/flat/standing-forward-fold-main.webp"
+  },
+  "unilateral": false,
+  "met": 5.0
+ },
+ "deadbug": {
+  "rep": "Dead Bug",
+  "repid": "dead-bug",
+  "files": {
+   "start": "images/flat/dead-bug-start.webp",
+   "peak": "images/flat/dead-bug-peak.webp"
+  },
+  "unilateral": false,
+  "met": 5.0
+ },
+ "birddog": {
+  "rep": "Bird-Dog",
+  "repid": "bird-dog",
+  "files": {
+   "start": "images/flat/bird-dog-start.webp",
+   "peak": "images/flat/bird-dog-peak.webp"
+  },
+  "unilateral": false,
+  "met": 5.0
+ },
+ "superman": {
+  "rep": "Superman",
+  "repid": "superman",
+  "files": {
+   "start": "images/flat/superman-start.webp",
+   "peak": "images/flat/superman-peak.webp"
+  },
+  "unilateral": false,
+  "met": 3.5
+ },
+ "bridge": {
+  "rep": "Glute Bridge",
+  "repid": "glute-bridge",
+  "files": {
+   "start": "images/flat/glute-bridge-start.webp",
+   "peak": "images/flat/glute-bridge-peak.webp"
+  },
+  "unilateral": false,
+  "met": 3.5
+ },
+ "calf": {
+  "rep": "Standing Calf Stretch",
+  "repid": "standing-calf-stretch",
+  "files": {
+   "main": "images/flat/standing-calf-stretch-main.webp"
+  },
+  "unilateral": true,
+  "met": 5.0
+ },
+ "quadstretch": {
+  "rep": "Standing Quad Stretch",
+  "repid": "standing-quad-stretch",
+  "files": {
+   "main": "images/flat/standing-quad-stretch-main.webp"
+  },
+  "unilateral": true,
+  "met": 5.0
+ },
+ "hipflex": {
+  "rep": "Kneeling Hip Flexor Stretch",
+  "repid": "kneeling-hip-flexor-stretch",
+  "files": {
+   "main": "images/flat/kneeling-hip-flexor-stretch-main.webp"
+  },
+  "unilateral": true,
+  "met": 5.0
+ },
+ "hamfold": {
+  "rep": "Seated Forward Fold",
+  "repid": "seated-forward-fold",
+  "files": {
+   "main": "images/flat/seated-forward-fold-main.webp"
+  },
+  "unilateral": false,
+  "met": 5.0
+ },
+ "sidebend": {
+  "rep": "Standing Side Bend",
+  "repid": "standing-side-bend",
+  "files": {
+   "main": "images/flat/standing-side-bend-main.webp"
+  },
+  "unilateral": true,
+  "met": 5.0
+ },
+ "chestopen": {
+  "rep": "Doorway Chest Stretch",
+  "repid": "doorway-chest-stretch",
+  "files": {
+   "main": "images/flat/doorway-chest-stretch-main.webp"
+  },
+  "unilateral": false,
+  "met": 5.0
+ }
+}

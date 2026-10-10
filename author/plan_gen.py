@@ -7,7 +7,7 @@ A = '/home/claude/grow/app/src/main/assets'
 EX = json.load(open(A + '/exercises.json'))
 IDX = {e['id']: i for i, e in enumerate(EX)}
 SIDED = {e['id']: e['sd'] for e in EX}
-START = datetime.date(2026, 10, 5); END = datetime.date(2030, 4, 18)
+START = datetime.date(2026, 10, 11); END = datetime.date(2030, 4, 18)
 TOTAL = (END - START).days + 1
 PH_START = [1, 91, 366, 731, 1101, TOTAL + 1]
 
@@ -50,7 +50,7 @@ DOSE = [(3.0, 4.5), (4.5, 6.0), (6.0, 7.5), (7.0, 8.5), (6.0, 7.0)]
 INT_LEN = [30, 35, 40, 40, 35]
 IMP_REST = [20, 20, 15, 15, 15]
 STR_REST = [20, 20, 15, 15, 15]
-W_COUNT = [4, 4, 4, 5, 4]; C_COUNT = [3, 3, 4, 4, 3]; S_COUNT = [4, 4, 5, 5, 4]; S_ROUNDS = [2, 2, 3, 3, 2]; D_COUNT = [3, 3, 3, 4, 3]; F_COUNT = [3, 3, 4, 4, 3]
+W_COUNT = [4, 4, 4, 5, 4]; C_COUNT = [3, 3, 4, 4, 3]; S_COUNT = [4, 4, 5, 5, 4]; S_ROUNDS = [2, 2, 3, 3, 2]; D_COUNT = [3, 3, 3, 4, 3]; F_COUNT = [3, 3, 3, 3, 3]
 
 def pick(pool, n, seed, used):
     out = []; k = seed

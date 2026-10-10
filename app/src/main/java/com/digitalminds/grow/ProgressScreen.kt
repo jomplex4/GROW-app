@@ -103,17 +103,11 @@ class ProgressScreen(val act: MainActivity) : Screen {
         col.addView(act.button("SAVE MEASUREMENT", C.RED, C.WHITE, 15f, 52, 26f).apply {
             setOnClickListener { measure.touched = true; measure.save(); refreshChart() }
         }, lp(MATCH, act.dp(52)).also { it.topMargin = act.dp(12) })
-        col.addView(act.reminderCard(), lp(MATCH, WRAP).also { it.topMargin = act.dp(14) })
 
         val about = act.card(18)
         about.addView(act.tv("About GROW", 16f, C.WHITE, MED))
         about.addView(act.tv("GROW builds the habits that support your best posture and frame: spinal decompression, impact for bone strength, core and posture work, and flexibility.\n\nExercise can recover the small height lost to daily spinal compression and improve posture, but it cannot override genetics or the point where growth plates close. A pediatrician or endocrinologist can check your bone age with a simple X-ray and tell you how much room is left to grow. Sleep 8 to 10 hours and eat enough protein, calcium and vitamin D.\n\nThe jaw and neck routine improves neck posture and jaw mobility. It cannot reshape facial bone, so stop if you feel pain or hear clicking.", 13f, C.GRAY, BODY).also { it.margins(t = act.dp(8)); it.setLineSpacing(act.dp(3).toFloat(), 1f) })
         col.addView(about, lp(MATCH, WRAP).also { it.topMargin = act.dp(14) })
-
-        val reset = act.tv("RESET PROGRESS", 13f, C.GRAY, HEAD, Gravity.CENTER).apply {
-            letterSpacing = 0.1f; background = act.ripple(act.round(C.CARD, 26f)); minHeight = act.dp(50); setOnClickListener { confirmReset() }
-        }
-        col.addView(reset, lp(MATCH, act.dp(50)).also { it.topMargin = act.dp(14) })
     }
 
     private fun chip(label: String, click: () -> Unit) = act.tv(label, 12f, C.WHITE, HEAD, Gravity.CENTER).apply {
@@ -135,73 +129,73 @@ class ProgressScreen(val act: MainActivity) : Screen {
             "Latest %.1f %s  ·  change since first entry %s%.1f %s".format(v(lastL), chart.unit, if (d >= 0) "+" else "", d, chart.unit)
         }
     }
-
-    private fun confirmReset() {
-        val d = android.app.Dialog(act)
-        d.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
-        val box = LinearLayout(act).apply {
-            orientation = LinearLayout.VERTICAL; background = act.round(C.CARD, 24f); setPadding(act.dp(24), act.dp(24), act.dp(24), act.dp(20))
-        }
-        box.addView(act.tv("Reset progress?", 20f, C.WHITE, HEAD))
-        box.addView(act.tv("This erases your completed days, streaks and measurements. Your settings stay. It cannot be undone.", 14f, C.GRAY, BODY).also { it.margins(t = act.dp(8)) })
-        val row = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL }
-        row.addView(act.button("CANCEL", C.RED, C.WHITE, 14f, 48, 24f).apply { setOnClickListener { d.dismiss() } }, lp(0, act.dp(48), 1f).also { it.rightMargin = act.dp(8) })
-        row.addView(act.button("RESET", C.CARD2, C.WHITE, 14f, 48, 24f).apply { setOnClickListener { act.store.resetProgress(); d.dismiss(); act.showHome() } }, lp(0, act.dp(48), 1f))
-        box.addView(row, lp(MATCH, WRAP).also { it.topMargin = act.dp(20) })
-        d.setContentView(box)
-        d.window?.apply { setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)); setLayout((act.resources.displayMetrics.widthPixels * 0.88f).toInt(), WRAP) }
-        d.show()
-    }
-
     override fun onBack(): Boolean { act.showHome(); return true }
 }
 
 class SettingsScreen(val act: MainActivity) : Screen {
-    override val view = FrameLayout(act)
+    override val view = ScrollView(act).apply { isVerticalScrollBarEnabled = false }
 
     init {
-        view.setBackgroundColor(C.BG)
-        val col = LinearLayout(act).apply { orientation = LinearLayout.VERTICAL; setPadding(act.dp(20), act.dp(10), act.dp(20), act.dp(20)) }
-        view.addView(col, FrameLayout.LayoutParams(-1, -1))
+        val root = FrameLayout(act)
+        (view as ScrollView).addView(root)
+        root.setBackgroundColor(C.BG)
+        val col = LinearLayout(act).apply { orientation = LinearLayout.VERTICAL; setPadding(act.dp(20), act.dp(10), act.dp(20), act.dp(40)) }
+        root.addView(col, FrameLayout.LayoutParams(-1, -1))
+
         val head = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
         head.addView(IconView(act, Ic.BACK).apply { setOnClickListener { act.showHome() } }, lp(act.dp(48), act.dp(48)))
         head.addView(act.tv("SETTINGS", 20f, C.WHITE, HEAD).also { it.letterSpacing = 0.18f })
         col.addView(head)
 
-        // voice
-        val v = act.card(18)
-        val vr = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
-        val vl = LinearLayout(act).apply { orientation = LinearLayout.VERTICAL }
-        vl.addView(act.tv("Voice guide", 17f, C.WHITE, MED))
-        vl.addView(act.tv("Announces exercises, halfway and the final countdown.", 12f, C.DIM, BODY).also { it.margins(t = act.dp(4)) })
-        vr.addView(vl, lp(0, WRAP, 1f))
-        val sw = android.widget.Switch(act).apply {
-            isChecked = act.store.voice
-            thumbTintList = android.content.res.ColorStateList(arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(C.RED, C.GRAY))
-            trackTintList = android.content.res.ColorStateList(arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(0x66FF2800, C.CARD2))
-            setOnCheckedChangeListener { _, on -> act.store.voice = on; act.speaker.enabled = on; if (on) act.speaker.say("Voice on") else act.speaker.stop() }
+        fun switch(label: String, sub: String, checked: Boolean, onChange: (Boolean) -> Unit): LinearLayout {
+            val card = act.card(18)
+            val row = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+            val left = LinearLayout(act).apply { orientation = LinearLayout.VERTICAL }
+            left.addView(act.tv(label, 17f, C.WHITE, MED))
+            if (sub.isNotEmpty()) left.addView(act.tv(sub, 12f, C.DIM, BODY).also { it.margins(t = act.dp(4)) })
+            row.addView(left, lp(0, WRAP, 1f))
+            val sw = android.widget.Switch(act).apply {
+                isChecked = checked
+                thumbTintList = android.content.res.ColorStateList(arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(C.RED, C.GRAY))
+                trackTintList = android.content.res.ColorStateList(arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(0x66FF2800, C.CARD2))
+                setOnCheckedChangeListener { _, on -> onChange(on) }
+            }
+            row.addView(sw)
+            card.addView(row)
+            return card
         }
-        vr.addView(sw)
-        v.addView(vr)
-        col.addView(v, lp(MATCH, WRAP).also { it.topMargin = act.dp(10) })
 
-        // rest
+        // Voice
+        col.addView(switch("Voice guide", "Announces exercises and countdown.", act.store.voice) { on ->
+            act.store.voice = on; act.speaker.enabled = on
+            if (on) act.speaker.say("Voice on") else act.speaker.stop()
+        }, lp(MATCH, WRAP).also { it.topMargin = act.dp(10) })
+
+        // Vibration
+        col.addView(switch("Vibration", "Vibrates on SKIP, previous and set start.", act.store.vibrationEnabled) { on ->
+            act.store.vibrationEnabled = on
+        }, lp(MATCH, WRAP).also { it.topMargin = act.dp(10) })
+
+        // Rest duration
         val r = act.card(18)
         r.addView(act.tv("Rest duration", 17f, C.WHITE, MED))
         val opts = LinearLayout(act).apply { orientation = LinearLayout.HORIZONTAL }
-        val names = arrayOf("SHORT", "STANDARD", "LONG"); val secs = arrayOf("8s", "12s", "20s")
+        val names = arrayOf("SHORT", "STANDARD", "LONG"); val secs = arrayOf("8 s", "12 s", "20 s")
         val chips = ArrayList<TextView>()
         fun paint() { for ((i, c) in chips.withIndex()) { val sel = act.store.restLevel == i; c.background = act.ripple(act.round(if (sel) C.RED else C.CARD2, 22f)); c.setTextColor(if (sel) C.WHITE else C.GRAY) } }
         for (i in 0..2) {
             val c = act.tv("${names[i]}\n${secs[i]}", 12f, C.GRAY, HEAD, Gravity.CENTER).apply { letterSpacing = 0.08f; setLineSpacing(act.dp(2).toFloat(), 1f) }
             c.setOnClickListener { act.store.restLevel = i; paint() }
-            chips.add(c)
-            opts.addView(c, lp(0, act.dp(62), 1f).also { it.rightMargin = if (i < 2) act.dp(8) else 0 })
+            chips.add(c); opts.addView(c, lp(0, act.dp(66), 1f).also { it.rightMargin = if (i < 2) act.dp(8) else 0 })
         }
         paint()
         r.addView(opts, lp(MATCH, WRAP).also { it.topMargin = act.dp(14) })
-        col.addView(r, lp(MATCH, WRAP).also { it.topMargin = act.dp(14) })
-        col.addView(act.tv("GROW  ·  DIGITALMINDS", 11f, C.DIM, HEAD, Gravity.CENTER).also { it.letterSpacing = 0.2f }, lp(MATCH, WRAP).also { it.topMargin = act.dp(30) })
+        col.addView(r, lp(MATCH, WRAP).also { it.topMargin = act.dp(10) })
+
+        // Daily reminder
+        col.addView(act.reminderCard(), lp(MATCH, WRAP).also { it.topMargin = act.dp(10) })
+
+        col.addView(act.tv("GROWTH  ·  DIGITALMINDS", 11f, C.DIM, HEAD, Gravity.CENTER).also { it.letterSpacing = 0.2f }, lp(MATCH, WRAP).also { it.topMargin = act.dp(36) })
     }
 
     override fun onBack(): Boolean { act.showHome(); return true }

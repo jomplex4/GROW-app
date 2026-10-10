@@ -15,7 +15,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:label="GROW"
+        android:label="GROWTH"
         android:supportsRtl="false"
         android:theme="@style/Theme.Grow">
 

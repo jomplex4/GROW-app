@@ -5,7 +5,7 @@ plan = open(A + '/plan.txt').read().split('\n'); jaw = open(A + '/jaw.txt').read
 fails = []
 def check(c, m):
     if not c: fails.append(m)
-START = datetime.date(2026, 10, 5); END = datetime.date(2030, 4, 18); TOTAL = (END - START).days + 1
+START = datetime.date(2026, 10, 11); END = datetime.date(2030, 4, 18); TOTAL = (END - START).days + 1
 check(len(ex) == 43, f'exercises {len(ex)}')
 ids = [e['id'] for e in ex]
 check(len(set(ids)) == 43, 'duplicate ids')
@@ -20,7 +20,7 @@ for e in ex:
         f = f'{d}/{k:02d}.webp'; check(os.path.exists(f), f'missing {f}'); total_bytes += os.path.getsize(f) if os.path.exists(f) else 0
     extra = [f for f in os.listdir(d) if f not in [f'{k:02d}.webp' for k in range(m['n'])]]
     check(not extra, f'unexpected files in {i}: {extra}')
-    check(m['w'] > 50 and m['h'] > 50 and m['n'] >= 2, f'bad meta {i}')
+    check(m['w'] > 50 and m['h'] > 50 and m['n'] >= 1, f'bad meta {i}')
 check(set(meta) == set(ids), 'meta ids differ from exercises')
 # plan
 check(len(plan) == TOTAL, f'plan lines {len(plan)} vs {TOTAL}')
@@ -72,7 +72,8 @@ for d in range(1, TOTAL + 1):
             ids_nonsided = [int(steps[i][0]) for i in sd]
             check(len(ids_nonsided) == len(set(ids_nonsided)), f'plan day {d} repeats a warm-up/core/stretch exercise')
         if name == 'plan': n_train += 1
-check(n_train == 1108, f'training days {n_train}')
+expected_train = sum(1 for d in range(TOTAL) if (START + datetime.timedelta(days=d)).weekday() != 5)
+check(n_train == expected_train, f'training days {n_train} vs {expected_train}')
 print('training days', n_train, 'rest days', TOTAL - n_train)
 print('session minutes (all rest settings): min %.1f max %.1f' % (min(mins), max(mins)))
 print('jaw minutes: min %.1f max %.1f' % (min(jmins), max(jmins)))
